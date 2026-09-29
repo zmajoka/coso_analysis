@@ -7,11 +7,11 @@
             questionnaire, label it (English), and save an analysis-ready
             dataset.
 
-  Input   : data/raw/data_exploration.xlsx
-  Outputs : data/clean/coso_baseline_clean.dta  (analysis file, no PII)
-            data/clean/coso_baseline_pii.dta    (names / phone numbers only,
+  Input   : $data/data_exploration.xlsx
+  Outputs : $cleandata/coso_baseline_clean.dta  (analysis file, no PII)
+            $cleandata/coso_baseline_pii.dta    (names / phone numbers only,
                                                  linked by interview__key)
-            output/01_import_clean.log
+            $out/01_import_clean.log
 
   Cleaning conventions
     - Yes/No questions (1=Oui, 2=Non) are recoded to 1=Yes, 0=No.
@@ -21,8 +21,8 @@
         .h  Respondent hung up  (-95, "Répondant a raccroché")
       Survey Solutions "not asked" codes (-999999999, ##N/A##) become
       system missing (.) or "".
-    - All rows (call attempts) are kept. Use the flags `consent', `complete'
-      and `final_obs' to select the analysis sample.
+    - All rows (call attempts) are kept. Use the flags consent, complete
+      and final_obs to select the analysis sample.
     - Data quality problems are flagged (flag_*), never dropped or edited.
 ==============================================================================*/
 
@@ -39,228 +39,142 @@ global data   "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Data
 global cleandata "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Data\Clean"
 global out   "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output"
 
-* Plausibility bounds used in the checks (edit to match program eligibility)
-local age_min 15
-local age_max 40
-
 capture log close
 log using "$out/01_import_clean.log", replace text
 
 *------------------------------------------------------------------------------*
-* 0b. Helper programs
-*------------------------------------------------------------------------------*
-
-* tonum: convert to numeric. Survey Solutions missing markers become ".".
-*   Stops with an error if a variable holds non-numeric text (e.g. labels
-*   exported instead of codes), unless -force- is given.
-capture program drop tonum
-program define tonum
-    syntax varlist [, force]
-    foreach v of local varlist {
-        capture confirm string variable `v'
-        if !_rc {
-            quietly replace `v' = strtrim(`v')
-            quietly replace `v' = "" if inlist(`v', "##N/A##", "NA", "N/A", ".")
-            quietly count if missing(real(`v')) & `v' != ""
-            if r(N) > 0 {
-                di as error "`v': " r(N) " non-numeric value(s):"
-                tab `v' if missing(real(`v')) & `v' != "", missing
-                if "`force'" == "" {
-                    di as error "Fix the values above or call tonum with -force-."
-                    exit 109
-                }
-            }
-            quietly destring `v', replace force
-        }
-        quietly replace `v' = . if `v' == -999999999
-    }
-end
-
-* todatetime: convert Survey Solutions timestamps to Stata %tc.
-*   Handles ISO strings (2026-08-10T09:15:32), DMY strings, Excel date-time
-*   cells already read as %tc/%td, and raw Excel serial numbers.
-capture program drop todatetime
-program define todatetime
-    syntax varlist
-    foreach v of local varlist {
-        tempvar t
-        capture confirm string variable `v'
-        if !_rc {
-            quietly replace `v' = strtrim(subinstr(`v', "T", " ", 1))
-            quietly replace `v' = "" if `v' == "##N/A##"
-            quietly gen double `t' = clock(substr(`v', 1, 19), "YMDhms")
-            quietly replace `t' = clock(`v', "DMYhms") if missing(`t') & `v' != ""
-            quietly replace `t' = clock(`v', "DMYhm")  if missing(`t') & `v' != ""
-            quietly count if missing(`t') & `v' != ""
-            if r(N) > 0 di as error "`v': " r(N) " value(s) could not be read as date-time"
-        }
-        else {
-            local fmt : format `v'
-            if substr("`fmt'", 1, 3) == "%tc" | substr("`fmt'", 1, 3) == "%tC" {
-                quietly gen double `t' = `v'
-            }
-            else if substr("`fmt'", 1, 3) == "%td" {
-                quietly gen double `t' = cofd(`v')
-            }
-            else {   // Excel serial number (days since 30dec1899)
-                quietly gen double `t' = round((`v' + td(30dec1899)) * 86400000) ///
-                    if `v' > 0 & !missing(`v')
-            }
-        }
-        drop `v'
-        rename `t' `v'
-        format `v' %tcDD/NN/CCYY_HH:MM:SS
-    }
-end
-
-* todate: convert to Stata daily date %td (same input cases as todatetime).
-capture program drop todate
-program define todate
-    syntax varlist
-    foreach v of local varlist {
-        tempvar t
-        capture confirm string variable `v'
-        if !_rc {
-            quietly replace `v' = strtrim(`v')
-            quietly replace `v' = "" if `v' == "##N/A##"
-            quietly gen `t' = date(substr(`v', 1, 10), "YMD")
-            quietly replace `t' = date(substr(`v', 1, 10), "DMY") if missing(`t') & `v' != ""
-            quietly count if missing(`t') & `v' != ""
-            if r(N) > 0 di as error "`v': " r(N) " value(s) could not be read as a date"
-        }
-        else {
-            local fmt : format `v'
-            if substr("`fmt'", 1, 3) == "%td" {
-                quietly gen `t' = `v'
-            }
-            else if substr("`fmt'", 1, 3) == "%tc" | substr("`fmt'", 1, 3) == "%tC" {
-                quietly gen `t' = dofc(`v')
-            }
-            else {
-                quietly gen `t' = floor(`v') + td(30dec1899) if `v' > 0 & !missing(`v')
-            }
-        }
-        drop `v'
-        rename `t' `v'
-        format `v' %tdDD/NN/CCYY
-    }
-end
-
-*------------------------------------------------------------------------------*
 * 1. Import
 *------------------------------------------------------------------------------*
-import excel using "$raw/data_exploration.xlsx", firstrow case(preserve) clear
+* Everything is read as text first, so every conversion below is explicit.
+import excel using "$data/data_exploration.xlsx", firstrow case(preserve) allstring clear
 
-* All variables expected from the export (stops if one is missing/renamed)
-#delimit ;
-local expected
-    interview__key interview__id cover_id cover_district cover_region localite
-    HHA_debut A1 A2_date A2_heure A4 A4X A5_date A5_heure HHA_fin
-    HHB_debut B1 B2 B3 B4 B5 B6 B6A B6B B6C B6D B6E B6F consentement B7 HHB_fin
-    HHC_debut C1 C2A_Jour C2A_Mois C2A_annee C2 C3 C4 C5 C6 C7 C8 C9 C10 C11
-        age HHC_fin
-    HHD_debut D1 D2 D3 D3X D4 D5__1 D5__2 D5__3 D5__4 D5__5 D5__6 D5__7
-        D5__8 D5__9 D5__10 D5__11 HHD_fin
-    HHE_debut E1 E2 E3 E3A EMPLOYE HHE_fin
-    HHF_debut F1 F1X F2 F2X F3 F3X F4 HHF_fin
-    HHG_debut G1 G2 G3 G4 G4A G5 G5A G6 G7 G7A HHG_fin
-    HHH_debut H1 H2 H3 H3A H4 H4A H5 H5A HHH_fin
-    HHI_debut I1 I2 I2X I3 I3X HHI_fin
-    HHJ_debut J0 J0A J0B J1 J1X J2 J3 HHJ_fin
-    HHK_debut K1 K2 K3 K3X K4 K4X K5__1 K5__2 K5__3 K5__4 K5__5 K5__6 K5__7
-        K5__9 K5X K6 K7 HHK_fin
-    HHL_debut L1 L2 L3 L4 L5 L5X L6 L7 L7X L8 L9 HHL_fin
-    HHM_debut M1 M2 M3 M4 HHM_fin
-    HHN_debut N1 N2 N2X N3 N4 N4X N5 N6 N7 HHN_fin
-    HHO_debut O1 O2 O3 O4 O5 O6 HHO_fin
-    HHP_debut P1 P2 P3 P4 P44X P5 HHP_fin
-    HHQ_debut Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 Q10 HHQ_fin
-    HHR_debut R1 R1A R2 R2A R3 R3A R3B R4 R5 R6 R7 HHR_fin
-    sssys_irnd has__errors interview__status assignment__id ;
-#delimit cr
-confirm variable `expected', exact
+* Stops here if a variable is missing or renamed in the export
+confirm variable ///
+    interview__key interview__id cover_id cover_district cover_region localite ///
+    HHA_debut A1 A2_date A2_heure A4 A4X A5_date A5_heure HHA_fin              ///
+    HHB_debut B1 B2 B3 B4 B5 B6 B6A B6B B6C B6D B6E B6F consentement B7 HHB_fin ///
+    HHC_debut C1 C2A_Jour C2A_Mois C2A_annee C2 C3 C4 C5 C6 C7 C8 C9 C10 C11  ///
+        age HHC_fin                                                             ///
+    HHD_debut D1 D2 D3 D3X D4 D5__1 D5__2 D5__3 D5__4 D5__5 D5__6 D5__7       ///
+        D5__8 D5__9 D5__10 D5__11 HHD_fin                                       ///
+    HHE_debut E1 E2 E3 E3A EMPLOYE HHE_fin                                      ///
+    HHF_debut F1 F1X F2 F2X F3 F3X F4 HHF_fin                                   ///
+    HHG_debut G1 G2 G3 G4 G4A G5 G5A G6 G7 G7A HHG_fin                          ///
+    HHH_debut H1 H2 H3 H3A H4 H4A H5 H5A HHH_fin                                ///
+    HHI_debut I1 I2 I2X I3 I3X HHI_fin                                          ///
+    HHJ_debut J0 J0A J0B J1 J1X J2 J3 HHJ_fin                                   ///
+    HHK_debut K1 K2 K3 K3X K4 K4X K5__1 K5__2 K5__3 K5__4 K5__5 K5__6 K5__7   ///
+        K5__9 K5X K6 K7 HHK_fin                                                 ///
+    HHL_debut L1 L2 L3 L4 L5 L5X L6 L7 L7X L8 L9 HHL_fin                        ///
+    HHM_debut M1 M2 M3 M4 HHM_fin                                               ///
+    HHN_debut N1 N2 N2X N3 N4 N4X N5 N6 N7 HHN_fin                              ///
+    HHO_debut O1 O2 O3 O4 O5 O6 HHO_fin                                         ///
+    HHP_debut P1 P2 P3 P4 P44X P5 HHP_fin                                       ///
+    HHQ_debut Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 Q10 HHQ_fin                            ///
+    HHR_debut R1 R1A R2 R2A R3 R3A R3B R4 R5 R6 R7 HHR_fin                      ///
+    sssys_irnd has__errors interview__status assignment__id, exact
 
 * Drop fully empty rows that Excel sometimes carries
-drop if missing(interview__key) | strtrim(interview__key) == ""
+drop if strtrim(interview__key) == ""
 isid interview__key
 
 * The questionnaire variable for "P4 - other sector" is misnamed P44X
 rename P44X P4X
-local expected : subinstr local expected "P44X" "P4X", word
 
 di as txt "Observations imported: " as res _N
 
 *------------------------------------------------------------------------------*
-* 2. Variable types
+* 2. Text clean-up and "respondent hung up" (all variables are text here)
+*------------------------------------------------------------------------------*
+gen byte hungup_any = 0
+
+foreach v of varlist interview__key-assignment__id {
+    quietly replace `v' = stritrim(strtrim(`v'))
+    quietly replace `v' = "" if `v' == "##N/A##"
+    quietly replace hungup_any = 1 if `v' == "-95" | strpos(lower(`v'), "raccroch") > 0
+    quietly replace `v' = "" if strpos(lower(`v'), "raccroch") > 0
+}
+* (-95 in numeric questions becomes .h in section 4; in text questions it is
+*  blanked in section 4 too)
+
+tab hungup_any
+
+*------------------------------------------------------------------------------*
+* 3. Variable types
 *------------------------------------------------------------------------------*
 
-* 2.1 Timestamps (Survey Solutions "current time") and dates
-local timestamps ""
-foreach s in A B C D E F G H I J K L M N O P Q R {
-    local timestamps `timestamps' HH`s'_debut HH`s'_fin
-}
-todatetime `timestamps' A5_heure
-todate     A2_date A5_date B6C B6F
+* 3.1 Numeric questions.
+*     Check the output: a line "contains nonnumeric characters; no replace"
+*     means that variable has text values that must be looked at.
+destring A1 A4 B1 B2 B3 B4 B5 B6 B6A B6B B6D B6E consentement             ///
+    C1 C2A_Jour C2A_Mois C2A_annee C2 C3 C4 C5 C6 C7 C8 age                 ///
+    D1 D2 D3 D4 D5__1 D5__2 D5__3 D5__4 D5__5 D5__6 D5__7 D5__8 D5__9       ///
+    D5__10 D5__11 E1 E2 E3 E3A EMPLOYE F1 F2 F3 F4                          ///
+    G1 G2 G3 G4 G4A G5 G6 G7 G7A H1 H2 H3 H3A H4 H4A H5 H5A                 ///
+    I1 I2 I3 J0 J0A J0B J1 J2 J3                                            ///
+    K1 K2 K3 K4 K5__1 K5__2 K5__3 K5__4 K5__5 K5__6 K5__7 K5__9 K6 K7       ///
+    L1 L2 L3 L4 L5 L6 L7 L8 L9 M1 M2 M3 M4 N1 N2 N3 N4 N5 N6 N7             ///
+    O1 O2 O3 O5 O6 P2 P3 P4 Q1 Q3 Q4 Q5 Q6 Q7 Q8 Q9 Q10                     ///
+    R1 R2 R3 R3A R5 R7 sssys_irnd has__errors, replace
 
-* 2.2 Free-text / identifier variables (kept as strings)
-local strings interview__key interview__id cover_id cover_district        ///
-    cover_region localite A2_heure A4X B7 C9 C10 C11 D3X F1X F2X F3X G5A  ///
-    I2X I3X J1X K3X K4X K5X L5X L7X N2X N4X O4 P1 P4X P5                   ///
-    R1A R2A R3B R4 R6 assignment__id
+* Q2 (times volunteered) is a TEXT question in CAPI but asks for a count.
+* Values that are not numbers are listed, then set to missing.
+tab Q2 if missing(real(Q2)) & Q2 != ""
+destring Q2, replace force
 
-foreach v of local strings {
-    capture confirm string variable `v'
-    if _rc tostring `v', replace usedisplayformat
-    quietly replace `v' = stritrim(strtrim(`v'))
-    quietly replace `v' = "" if inlist(`v', "##N/A##", ".")
-}
-
-* 2.3 Everything else must be numeric
-*     Q2 (times volunteered) is a TEXT question in CAPI but asks for a count
-local numeric : list expected - strings
-local numeric : list numeric - timestamps
-local notnum Q2 interview__status A5_heure A2_date A5_date B6C B6F
-local numeric : list numeric - notnum
-tonum `numeric'
-tonum Q2, force
-
-* interview__status may be exported as a code or as text
-capture confirm string variable interview__status
-if _rc {
-    label define status -1 "Deleted" 0 "Restored" 20 "Created"                 ///
-        40 "SupervisorAssigned" 60 "InterviewerAssigned"                         ///
-        65 "RejectedBySupervisor" 80 "ReadyForInterview" 85 "SentToCapi"         ///
-        95 "Restarted" 100 "Completed" 120 "ApprovedBySupervisor"                ///
-        125 "RejectedByHeadquarters" 130 "ApprovedByHeadquarters"
-    label values interview__status status
-}
+* interview__status is converted only if exported as a code (e.g. 100);
+* if exported as text (e.g. "Completed") it stays text.
+destring interview__status, replace
 
 * Geographic codes are up to 10 digits: store as long for exact labels
 recast long B1 B2 B3 B4
 
-*------------------------------------------------------------------------------*
-* 3. Respondent hung up (-95 / "Répondant a raccroché")  ->  .h
-*------------------------------------------------------------------------------*
-gen byte hungup_any = 0
+* 3.2 Timestamps (Survey Solutions "current time") -> Stata %tc
+*     Reads 2026-08-10T09:15:32, 10/08/2026 09:15:32, or an Excel serial number.
+foreach v in HHA_debut HHA_fin HHB_debut HHB_fin HHC_debut HHC_fin            ///
+             HHD_debut HHD_fin HHE_debut HHE_fin HHF_debut HHF_fin            ///
+             HHG_debut HHG_fin HHH_debut HHH_fin HHI_debut HHI_fin            ///
+             HHJ_debut HHJ_fin HHK_debut HHK_fin HHL_debut HHL_fin            ///
+             HHM_debut HHM_fin HHN_debut HHN_fin HHO_debut HHO_fin            ///
+             HHP_debut HHP_fin HHQ_debut HHQ_fin HHR_debut HHR_fin A5_heure {
+    gen double `v'_c = clock(substr(subinstr(`v', "T", " ", 1), 1, 19), "YMDhms")
+    replace `v'_c = clock(`v', "DMYhms") if missing(`v'_c)
+    replace `v'_c = round((real(`v') + td(30dec1899)) * 86400000) if missing(`v'_c)
+    count if missing(`v'_c) & `v' != ""        // should be 0
+    format `v'_c %tcDD/NN/CCYY_HH:MM:SS
+    order `v'_c, after(`v')
+    drop `v'
+    rename `v'_c `v'
+}
 
-foreach v of local numeric {
-    quietly replace hungup_any = 1 if `v' == -95
-    quietly replace `v' = .h        if `v' == -95
+* 3.3 Dates -> Stata %td
+foreach v in A2_date A5_date B6C B6F {
+    gen `v'_c = date(substr(`v', 1, 10), "YMD")
+    replace `v'_c = date(substr(`v', 1, 10), "DMY") if missing(`v'_c)
+    replace `v'_c = floor(real(`v')) + td(30dec1899) if missing(`v'_c)
+    count if missing(`v'_c) & `v' != ""        // should be 0
+    format `v'_c %tdDD/NN/CCYY
+    order `v'_c, after(`v')
+    drop `v'
+    rename `v'_c `v'
 }
-foreach v in Q2 {
-    quietly replace hungup_any = 1 if `v' == -95
-    quietly replace `v' = .h        if `v' == -95
-}
-foreach v of local strings {
-    quietly replace hungup_any = 1 if `v' == "-95" | ///
-        strpos(lower(`v'), "raccroch") > 0
-    quietly replace `v' = "" if `v' == "-95" | strpos(lower(`v'), "raccroch") > 0
-}
-tab hungup_any
+
+* 3.4 What is still text should be only the open-ended / ID variables
+ds, has(type string)
 
 *------------------------------------------------------------------------------*
-* 4. Special codes -> extended missing
+* 4. Missing-value codes
 *------------------------------------------------------------------------------*
+
+* Survey Solutions "not asked" (-999999999) -> .   and   hung up (-95) -> .h
+ds, has(type numeric)
+mvdecode `r(varlist)', mv(-999999999 = . \ -95 = .h)
+
+* Hung up (-95) typed in a text question -> blank
+ds, has(type string)
+foreach v in `r(varlist)' {
+    replace `v' = "" if `v' == "-95"
+}
 
 * Don't know (.d)
 replace C2A_Jour  = .d if C2A_Jour  == 98
@@ -271,9 +185,13 @@ replace L4        = .d if L4        == 999998    // "Ne sait pas / ça varie"
 replace L8        = .d if L8        == 99998
 replace H4        = .d if H4        == 3
 replace K4        = .d if K4        == 7
-foreach v in Q4 Q5 Q6 Q7 Q8 Q9 Q10 {
-    replace `v' = .d if `v' == 9
-}
+replace Q4        = .d if Q4        == 9
+replace Q5        = .d if Q5        == 9
+replace Q6        = .d if Q6        == 9
+replace Q7        = .d if Q7        == 9
+replace Q8        = .d if Q8        == 9
+replace Q9        = .d if Q9        == 9
+replace Q10       = .d if Q10       == 9
 
 * Refused / prefers not to say (.r)
 replace H2 = .r if H2 == 10
@@ -283,21 +201,15 @@ replace H5 = .r if H5 == 999999
 *------------------------------------------------------------------------------*
 * 5. Yes/No questions: 1=Oui, 2=Non  ->  1=Yes, 0=No
 *------------------------------------------------------------------------------*
-local yesno B6 B6A B6B B6D B6E C6 C7 E1 E2 E3 G2 G4 G5 G7 G7A H4 I1 J0 ///
+* Spot check before recoding: every variable should have min 1 and max 2
+summarize B6 B6A B6B B6D B6E C6 C7 E1 E2 E3 G2 G4 G5 G7 G7A H4 I1 J0 ///
     J0B J3 K1 K2 K6 L1 L2 L6 N1 O1 O3 Q1 R1 R2 R3 R3A R5
 
-foreach v of local yesno {
-    quietly count if !inlist(`v', 1, 2) & !missing(`v')
-    if r(N) > 0 di as error "`v': " r(N) " value(s) outside 1/2 before recoding"
-    quietly recode `v' (2 = 0)
-}
+recode B6 B6A B6B B6D B6E C6 C7 E1 E2 E3 G2 G4 G5 G7 G7A H4 I1 J0 ///
+    J0B J3 K1 K2 K6 L1 L2 L6 N1 O1 O3 Q1 R1 R2 R3 R3A R5 (2 = 0)
 
-* Multi-select dummies (D5, K5): Survey Solutions exports 1/0
-local d5_assets D5__1 D5__2 D5__3 D5__4 D5__5 D5__6 D5__7 D5__8 D5__9 D5__10
-foreach v of varlist D5__* K5__* {
-    quietly count if !inlist(`v', 0, 1) & !missing(`v')
-    if r(N) > 0 di as error "`v': " r(N) " value(s) outside 0/1"
-}
+* Multi-select dummies (D5, K5) are exported as 1/0: min 0, max 1 expected
+summarize D5__* K5__*
 
 *------------------------------------------------------------------------------*
 * 6. Constructed variables
@@ -307,7 +219,6 @@ foreach v of varlist D5__* K5__* {
 * The CAPI variable -consentement- equals 1 whenever B6B and B6E are not "No",
 * so it is 1 for unreached respondents and for callbacks. Rebuild it from B6D.
 rename consentement consentement_capi
-local expected : subinstr local expected "consentement" "consentement_capi", word
 gen byte consent = B6D if inlist(B6D, 0, 1)
 label var consent "Consented to the interview (B6D)"
 
@@ -333,7 +244,6 @@ label var final_obs "Selected row for this respondent (completed, else latest at
 * 6.3 Age: use full date of birth where known, CAPI fallback otherwise
 *     (CAPI -age- = C2, else 2026 - birth year)
 rename age age_capi
-local expected : subinstr local expected "age" "age_capi", word
 gen dob = mdy(C2A_Mois, C2A_Jour, C2A_annee)
 format dob %tdDD/NN/CCYY
 label var dob "Date of birth (C2A)"
@@ -358,7 +268,8 @@ gen byte employed = (E1 == 1 | E2 == 1 | (E3 == 1 & E3A == 1)) if !missing(E1)
 label var employed "Employed last 7 days (E1/E2/E3, recomputed)"
 
 * 6.6 Assets
-egen n_assets = rowtotal(`d5_assets') if !missing(D5__1)
+egen n_assets = rowtotal(D5__1 D5__2 D5__3 D5__4 D5__5 D5__6 D5__7 D5__8 ///
+    D5__9 D5__10) if !missing(D5__1)
 label var n_assets "Number of household assets owned (D5, out of 10)"
 
 * 6.7 Hours
@@ -393,52 +304,7 @@ foreach s in A B C D E F G H I J K L M N O P Q R {
 }
 
 *------------------------------------------------------------------------------*
-* 7. Data quality flags (nothing is changed or dropped)
-*------------------------------------------------------------------------------*
-gen byte flag_consent_capi = (consentement_capi == 1 & consent != 1)
-label var flag_consent_capi "CAPI consent = 1 but B6D consent not given"
-
-gen byte flag_employe = (employed != EMPLOYE) if !missing(employed, EMPLOYE)
-label var flag_employe "Recomputed employment differs from CAPI EMPLOYE"
-
-gen byte flag_age = (age_clean < `age_min' | age_clean > `age_max') ///
-    if !missing(age_clean)
-label var flag_age "Age outside `age_min'-`age_max'"
-
-gen byte flag_age_c2 = (abs(age_clean - C2) > 1) if !missing(age_clean, C2) ///
-    & !missing(C2A_annee)
-label var flag_age_c2 "Reported age C2 inconsistent with birth year"
-
-gen byte flag_hh_u15 = (D2 >= D1) if !missing(D1, D2)
-label var flag_hh_u15 "Members under 15 (D2) not below household size (D1)"
-
-gen byte flag_hh_workers = (D4 > D1) if !missing(D1, D4)
-label var flag_hh_workers "Earning members (D4) exceed household size (D1)"
-
-gen byte flag_hh_size = (D1 < 1 | D1 > 50) if !missing(D1)
-label var flag_hh_size "Household size (D1) below 1 or above 50"
-
-egen _nd5 = rowtotal(`d5_assets')
-gen byte flag_assets_none = (D5__11 == 1 & _nd5 > 0) if !missing(D5__11)
-drop _nd5
-label var flag_assets_none "'None of the above' selected together with an asset"
-
-gen byte flag_hours = (hours_total > 112) if !missing(hours_total)
-label var flag_hours "More than 112 hours worked last week (16h/day)"
-
-gen byte flag_income = (H3 < 0 | H5 <= 0 | L4 < 0 | L8 < 0 | P3 < 0) ///
-    if !missing(H3) | !missing(H5) | !missing(L4) | !missing(L8) | !missing(P3)
-label var flag_income "Negative income/savings/debt, or H5 not positive"
-
-gen byte flag_first_job = (O2 < 5 | O2 > age_clean) if !missing(O2, age_clean)
-label var flag_first_job "Age at first job (O2) below 5 or above current age"
-
-gen byte flag_skip_emp = (employed == 1 & !missing(J0)) | ///
-                         (employed == 0 & !missing(F1)) if !missing(employed)
-label var flag_skip_emp "Employed answered section J, or non-employed answered F"
-
-*------------------------------------------------------------------------------*
-* 8. Value labels (English)
+* 7. Value labels (English)
 *------------------------------------------------------------------------------*
 label define yesno 0 "No" 1 "Yes"
 
@@ -756,6 +622,11 @@ label define trust 1 "Not at all" 2 "Just a little" 3 "Somewhat" 4 "A lot"
 label define R7 1 "Self" 2 "A relative" 3 "A friend / acquaintance"
 label define missing_only .d "Don't know" .r "Refused / prefers not to say" ///
     .h "Respondent hung up"
+label define status -1 "Deleted" 0 "Restored" 20 "Created"                 ///
+    40 "SupervisorAssigned" 60 "InterviewerAssigned"                         ///
+    65 "RejectedBySupervisor" 80 "ReadyForInterview" 85 "SentToCapi"         ///
+    95 "Restarted" 100 "Completed" 120 "ApprovedBySupervisor"                ///
+    125 "RejectedByHeadquarters" 130 "ApprovedByHeadquarters"
 
 * Add the extended-missing labels to every value label
 label dir
@@ -765,7 +636,8 @@ foreach l in `r(names)' {
 }
 
 * Attach value labels
-label values `yesno' yesno
+label values B6 B6A B6B B6D B6E C6 C7 E1 E2 E3 G2 G4 G5 G7 G7A H4 I1 J0 ///
+    J0B J3 K1 K2 K6 L1 L2 L6 N1 O1 O3 Q1 R1 R2 R3 R3A R5 yesno
 label values D5__* K5__* yesno
 label values consent complete partial final_obs female employed hungup_any yesno
 label values EMPLOYE consentement_capi yesno
@@ -817,9 +689,11 @@ label values Q4 Q5 Q6 Q7 Q8 Q9 Q10 trust
 label values R7 R7
 label values C2A_Jour C2A_Mois C2A_annee C2 D1 D2 D4 G3 G4A G6 H3 H4A H5  ///
     L4 L8 O2 P3 Q2 wage_month inc_month missing_only
+capture confirm numeric variable interview__status
+if !_rc label values interview__status status
 
 *------------------------------------------------------------------------------*
-* 9. Variable labels (English)
+* 8. Variable labels (English)
 *------------------------------------------------------------------------------*
 * Identification / cover
 label var interview__key     "Survey Solutions interview key"
@@ -1046,15 +920,55 @@ label var R7  "R7. Owner of the Wave number"
 label var hungup_any "Respondent hung up during interview (-95 recorded)"
 
 *------------------------------------------------------------------------------*
-* 9b. Checks that need value labels, and flag summary
+* 9. Data quality flags (nothing is changed or dropped)
 *------------------------------------------------------------------------------*
-gen byte flag_geo = 0 if !missing(B1)
+gen byte flag_consent_capi = (consentement_capi == 1 & consent != 1)
+label var flag_consent_capi "CAPI consent = 1 but B6D consent not given"
+
+gen byte flag_employe = (employed != EMPLOYE) if !missing(employed, EMPLOYE)
+label var flag_employe "Recomputed employment differs from CAPI EMPLOYE"
+
+* Age bounds: edit to match program eligibility
+gen byte flag_age = (age_clean < 15 | age_clean > 40) if !missing(age_clean)
+label var flag_age "Age outside 15-40"
+
+gen byte flag_age_c2 = (abs(age_clean - C2) > 1) if !missing(age_clean, C2) ///
+    & !missing(C2A_annee)
+label var flag_age_c2 "Reported age C2 inconsistent with birth year"
+
+gen byte flag_hh_u15 = (D2 >= D1) if !missing(D1, D2)
+label var flag_hh_u15 "Members under 15 (D2) not below household size (D1)"
+
+gen byte flag_hh_workers = (D4 > D1) if !missing(D1, D4)
+label var flag_hh_workers "Earning members (D4) exceed household size (D1)"
+
+gen byte flag_hh_size = (D1 < 1 | D1 > 50) if !missing(D1)
+label var flag_hh_size "Household size (D1) below 1 or above 50"
+
+gen byte flag_assets_none = (D5__11 == 1 & n_assets > 0) if !missing(D5__11)
+label var flag_assets_none "'None of the above' selected together with an asset"
+
+gen byte flag_hours = (hours_total > 112) if !missing(hours_total)
+label var flag_hours "More than 112 hours worked last week (16h/day)"
+
+gen byte flag_income = (H3 < 0 | H5 <= 0 | L4 < 0 | L8 < 0 | P3 < 0) ///
+    if !missing(H3) | !missing(H5) | !missing(L4) | !missing(L8) | !missing(P3)
+label var flag_income "Negative income/savings/debt, or H5 not positive"
+
+gen byte flag_first_job = (O2 < 5 | O2 > age_clean) if !missing(O2, age_clean)
+label var flag_first_job "Age at first job (O2) below 5 or above current age"
+
+gen byte flag_skip_emp = (employed == 1 & !missing(J0)) | ///
+                         (employed == 0 & !missing(F1)) if !missing(employed)
+label var flag_skip_emp "Employed answered section J, or non-employed answered F"
+
 decode B1, gen(_b1)
 decode B2, gen(_b2)
+gen byte flag_geo = 0 if !missing(B1)
 replace flag_geo = 1 if !missing(B1) & cover_district != "" & ///
-    upper(strtrim(cover_district)) != upper(strtrim(_b1))
+    upper(cover_district) != upper(strtrim(_b1))
 replace flag_geo = 1 if !missing(B2) & cover_region != "" & ///
-    upper(strtrim(cover_region)) != upper(strtrim(_b2))
+    upper(cover_region) != upper(strtrim(_b2))
 drop _b1 _b2
 label var flag_geo "Reported district/region (B1/B2) differs from cover"
 
@@ -1064,33 +978,26 @@ label var flag_short "Completed interview shorter than 10 minutes"
 gen byte flag_errors = (has__errors > 0) if !missing(has__errors)
 label var flag_errors "Survey Solutions reports validation errors"
 
-di as txt _n "{hline 60}" _n "Data quality flags (number of rows flagged)" _n "{hline 60}"
-foreach f of varlist flag_* {
-    quietly count if `f' == 1
-    di as txt %-22s "`f'" as res %8.0f r(N) as txt "   `: var label `f''"
-}
+* Summary: sum = number of rows flagged, mean = share of rows checked
+tabstat flag_*, statistics(sum mean n) columns(statistics) varwidth(20)
 
 *------------------------------------------------------------------------------*
 * 10. Save: PII file and analysis file
 *------------------------------------------------------------------------------*
-local pii B7 R1A R2A R3B R4 R6
-
-order `expected' consent complete partial final_obs n_rows_id hungup_any ///
-    int_date dob age_clean female employed n_assets hours_total         ///
-    wage_month inc_month dur_* flag_*
+order flag_*, last
 sort cover_id interview__key
-
 compress
 label data "COSO baseline phone survey - clean, all call attempts"
 
+* Personal identifiers go to a separate restricted file
 preserve
-    keep interview__key cover_id `pii'
+    keep interview__key cover_id B7 R1A R2A R3B R4 R6
     label data "COSO baseline - personal identifiers (restricted)"
-    save "$clean/coso_baseline_pii.dta", replace
+    save "$cleandata/coso_baseline_pii.dta", replace
 restore
 
-drop `pii'
-save "$clean/coso_baseline_clean.dta", replace
+drop B7 R1A R2A R3B R4 R6
+save "$cleandata/coso_baseline_clean.dta", replace
 
 di as txt _n "Rows: " as res _N
 tab complete final_obs, missing
