@@ -1,0 +1,19 @@
+# Stata
+*.dta
+*.log
+*.stpr
+*.stbak
+
+# Raw data — never commit
+data/raw/*
+!data/raw/.gitkeep
+
+# Outputs — don't commit
+output/tables/*
+output/figures/*
+!output/tables/.gitkeep
+!output/figures/.gitkeep
+
+# System files
+.DS_Store
+Thumbs.db
