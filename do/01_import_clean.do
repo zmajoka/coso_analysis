@@ -34,10 +34,10 @@ set varabbrev off
 *------------------------------------------------------------------------------*
 * 0. Paths - set the project root once here
 *------------------------------------------------------------------------------*
-global root  "C:/Users/`c(username)'/Documents/coso_analysis"   // <-- EDIT
-global raw   "$root/data/raw"
-global clean "$root/data/clean"
-global out   "$root/output"
+
+global data   "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Data"
+global cleandata "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Data\Clean"
+global out   "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output"
 
 * Plausibility bounds used in the checks (edit to match program eligibility)
 local age_min 15
