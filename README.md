@@ -7,6 +7,10 @@ Baseline survey data analysis and do files.
 |------|--------------|
 | `do/01_import_clean.do` | Imports `data_exploration.xlsx`, cleans and labels it following `docs/Original Questionnaire_COSO_V5.pdf`, saves the clean dataset |
 
+Data problems found during cleaning, and questions for the survey firm, are in `docs/data_issues.md`.
+
+**Analysis sample:** completed surveys only (`keep if complete == 1`).
+
 ## Folders (globals set at the top of each do file)
 
 - `$data` – raw data (e.g. `data_exploration.xlsx`)
