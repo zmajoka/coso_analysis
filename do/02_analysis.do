@@ -15,6 +15,7 @@
     0. Paths
     1. Data and sample (common to all analyses)
     2. Analysis 1 - Track size (provisional track assignment)
+    3. Analysis 2 - Sector concentration by geography (saturation risk)
 
   ------------------------------------------------------------------------------
   Analysis 1 - Track size
@@ -70,12 +71,6 @@ label var dup_id "cover_id has more than one completed interview"
 gen byte status_ok = (interview__status == "Completed")
 label var status_ok "Interview status: Completed (not rejected)"
 label values dup_id status_ok yesno
-
-* Column variable for one-way tables
-gen byte total = 1
-label define total 1 "Total"
-label values total total
-label var total "Total"
 
 *==============================================================================*
 * 2. ANALYSIS 1 - TRACK SIZE
@@ -162,26 +157,26 @@ tab track K1, missing
 *------------------------------------------------------------------------------*
 
 * 2.3.1 Track size
-tabout track total using "$out/Results.xls", ///
-    replace c(freq col) format(0c 1p) layout(cb) style(xls) ///
+tabout track using "$out/Results.xls", ///
+    replace oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Provisional programme track - completed interviews")
 
 * 2.3.2 Criteria met (tracks A and C can overlap)
-tabout crit_A total using "$out/Results.xls", ///
-    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+tabout crit_A using "$out/Results.xls", ///
+    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Meets Track A criteria: never started an activity and wants to start one")
 
-tabout crit_B total using "$out/Results.xls", ///
-    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+tabout crit_B using "$out/Results.xls", ///
+    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative")
 
-tabout crit_C total using "$out/Results.xls", ///
-    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+tabout crit_C using "$out/Results.xls", ///
+    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade")
 
 * 2.3.3 Why undetermined
-tabout undet_reason total if track == 5 using "$out/Results.xls", ///
-    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+tabout undet_reason if track == 5 using "$out/Results.xls", ///
+    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Undetermined track - reason")
 
 * 2.3.4 Track by sex and by district
@@ -198,12 +193,143 @@ tabout track status_ok using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Provisional track by interview status (Yes = Completed, No = rejected/assigned)")
 
-tabout track total if dup_id == 0 using "$out/Results.xls", ///
-    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+tabout track if dup_id == 0 using "$out/Results.xls", ///
+    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Provisional track - excluding cover_ids with more than one completed interview")
 
 *==============================================================================*
-* 3. ANALYSIS 2 - (next analysis goes here; tables use -append-)
+* 3. ANALYSIS 2 - SECTOR CONCENTRATION BY GEOGRAPHY
+*==============================================================================*
+* Market saturation risk: are many applicants aiming for (or already in) the
+* same sector in the same area?
+*   Aspired sector : P4, all completed interviews
+*   Current sector : F2, employed applicants only (F asked if employed)
+*   Geography      : region (B2) and urban/rural (B5)
+* A region x sector cell where more than 30% of the region's applicants share
+* the same sector is flagged as a saturation risk zone.
+* Note: P4/F2 are broad sectors ("Other services" groups tailors, mechanics,
+* hairdressers...). Regions are small (see 3.1): read shares with the counts.
+
+*------------------------------------------------------------------------------*
+* 3.1 Sample by region and urban/rural
+*------------------------------------------------------------------------------*
+tabout B2 using "$out/Results.xls", ///
+    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 2 - Completed interviews by region")
+
+tabout B2 B5 using "$out/Results.xls", ///
+    append c(freq row) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 2 - Completed interviews by region and urban/rural")
+
+*------------------------------------------------------------------------------*
+* 3.2 Aspired sector (P4) by region and by urban/rural
+*------------------------------------------------------------------------------*
+tabout P4 B2 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 2 - Aspired sector (P4) by region: number and % of the region's applicants")
+
+tabout P4 B5 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 2 - Aspired sector (P4) by urban/rural")
+
+*------------------------------------------------------------------------------*
+* 3.3 Aspired sector: top 3 per region and saturation risk (> 30%)
+*------------------------------------------------------------------------------*
+preserve
+    keep if !missing(P4, B2)
+    gen byte one = 1
+    collapse (sum) n = one, by(B2 P4)
+
+    bysort B2: egen n_region = total(n)
+    gen share = 100 * n / n_region
+    egen rank = rank(-n), by(B2) field          // 1 = most common; ties share a rank
+    gen byte saturation = (share > 30)
+
+    label var n          "Applicants aspiring to the sector"
+    label var n_region   "Applicants in the region"
+    label var share      "Share of the region's applicants (%)"
+    label var rank       "Rank of the sector in the region"
+    label var saturation "More than 30% of the region's applicants"
+
+    * Spot check
+    sort B2 rank
+    list B2 P4 n n_region share rank saturation if rank <= 3, sepby(B2) noobs
+
+    tabout P4 B2 if rank <= 3 using "$out/Results.xls", ///
+        append sum c(mean share) format(1) layout(cb) style(xls) ///
+        h1("Analysis 2 - Top 3 aspired sectors in each region: % of the region's applicants (blank = not in top 3)")
+
+    tabout P4 B2 if rank <= 3 using "$out/Results.xls", ///
+        append sum c(mean rank) format(0) layout(cb) style(xls) ///
+        h1("Analysis 2 - Top 3 aspired sectors in each region: rank (1 = most common)")
+
+    count if saturation == 1
+    if r(N) > 0 {
+        tabout P4 B2 if saturation == 1 using "$out/Results.xls", ///
+            append sum c(mean share) format(1) layout(cb) style(xls) ///
+            h1("Analysis 2 - SATURATION RISK: aspired sector chosen by more than 30% of the region's applicants (%)")
+    }
+restore
+
+*------------------------------------------------------------------------------*
+* 3.4 Current sector (F2, employed) by region and by urban/rural
+*------------------------------------------------------------------------------*
+tabout F2 B2 if employed == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 2 - Current sector (F2) by region, employed applicants: number and % of the region's employed")
+
+tabout F2 B5 if employed == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 2 - Current sector (F2) by urban/rural, employed applicants")
+
+*------------------------------------------------------------------------------*
+* 3.5 Current sector: top 3 per region and saturation risk (> 30%)
+*------------------------------------------------------------------------------*
+preserve
+    keep if employed == 1 & !missing(F2, B2)
+    gen byte one = 1
+    collapse (sum) n = one, by(B2 F2)
+
+    bysort B2: egen n_region = total(n)
+    gen share = 100 * n / n_region
+    egen rank = rank(-n), by(B2) field
+    gen byte saturation = (share > 30)
+
+    label var n          "Employed applicants in the sector"
+    label var n_region   "Employed applicants in the region"
+    label var share      "Share of the region's employed applicants (%)"
+    label var rank       "Rank of the sector in the region"
+    label var saturation "More than 30% of the region's employed applicants"
+
+    * Spot check
+    sort B2 rank
+    list B2 F2 n n_region share rank saturation if rank <= 3, sepby(B2) noobs
+
+    tabout F2 B2 if rank <= 3 using "$out/Results.xls", ///
+        append sum c(mean share) format(1) layout(cb) style(xls) ///
+        h1("Analysis 2 - Top 3 current sectors in each region: % of the region's employed applicants (blank = not in top 3)")
+
+    tabout F2 B2 if rank <= 3 using "$out/Results.xls", ///
+        append sum c(mean rank) format(0) layout(cb) style(xls) ///
+        h1("Analysis 2 - Top 3 current sectors in each region: rank (1 = most common)")
+
+    count if saturation == 1
+    if r(N) > 0 {
+        tabout F2 B2 if saturation == 1 using "$out/Results.xls", ///
+            append sum c(mean share) format(1) layout(cb) style(xls) ///
+            h1("Analysis 2 - SATURATION RISK: current sector of more than 30% of the region's employed applicants (%)")
+    }
+restore
+
+*------------------------------------------------------------------------------*
+* 3.6 Aspired vs current sector (employed): moving into or staying in a sector
+*------------------------------------------------------------------------------*
+tabout F2 P4 if employed == 1 using "$out/Results.xls", ///
+    append c(freq row) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 2 - Current sector (rows) by aspired sector (columns), employed applicants: row %")
+
+*==============================================================================*
+* 4. ANALYSIS 3 - (next analysis goes here; tables use -append-)
 *==============================================================================*
 
 log close
