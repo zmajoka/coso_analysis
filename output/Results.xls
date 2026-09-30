@@ -65,34 +65,6 @@ Tracks A and C (both apply)	14	2.4%
 Undetermined	64	10.8%
 Total	594	100.0%
 
-B2. Region	No.	%
-KABADOUGOU	34	5.4%
-FOLON	33	5.3%
-PORO	139	22.1%
-BAGOUE	18	2.9%
-TCHOLOGO	106	16.9%
-WORODOUGOU	42	6.7%
-BAFING	14	2.2%
-BERE	52	8.3%
-GONTOUGO	144	22.9%
-BOUNKANI	46	7.3%
-Total	628	100.0%
-
-Analysis 2 - Completed interviews by region and urban/rural
-B2. Region	Urban	Rural	Total	Urban	Rural	Total
-	No.	No.	No.	%	%	%
-KABADOUGOU	3	31	34	8.8%	91.2%	100.0%
-FOLON	9	24	33	27.3%	72.7%	100.0%
-PORO	33	106	139	23.7%	76.3%	100.0%
-BAGOUE	3	15	18	16.7%	83.3%	100.0%
-TCHOLOGO	6	100	106	5.7%	94.3%	100.0%
-WORODOUGOU	20	22	42	47.6%	52.4%	100.0%
-BAFING	2	12	14	14.3%	85.7%	100.0%
-BERE	8	44	52	15.4%	84.6%	100.0%
-GONTOUGO	24	120	144	16.7%	83.3%	100.0%
-BOUNKANI	8	38	46	17.4%	82.6%	100.0%
-Total	116	512	628	18.5%	81.5%	100.0%
-
 Analysis 2 - Aspired sector (P4) by region: number and % of the region's applicants
 P4. Sector of greatest interest	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAFING	BERE	GONTOUGO	BOUNKANI	Total	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAFING	BERE	GONTOUGO	BOUNKANI	Total
 	No.	No.	No.	No.	No.	No.	No.	No.	No.	No.	No.	%	%	%	%	%	%	%	%	%	%	%
@@ -132,37 +104,21 @@ Total	116	512	628	100.0%	100.0%	100.0%
 Analysis 2 - Top 3 aspired sectors in each region: % of the region's applicants (blank = not in top 3)
 P4. Sector of greatest interest	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAFING	BERE	GONTOUGO	BOUNKANI	Total
 	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share
-Agriculture, livestock, fishing, forestry				22.2			35.7				29.0
-Manufacturing		12.1		5.6						2.2	6.6
-Construction		12.1		22.2		4.8	14.3			6.5	12.0
-Wholesale / retail trade							7.1				7.1
-Transport, storage, logistics	2.9				0.9	4.8		1.9	1.4		2.4
-Accommodation and food services					0.9			3.8	1.4		2.1
-Information, communication, digital								1.9		2.2	2.0
-Finance and insurance						2.4					2.4
-Public administration	2.9		0.7					3.8	1.4		2.2
-Education			0.7								0.7
-Health and social work	5.9								0.7		3.3
-Other services (repair, personal, arts)	5.9										5.9
-Other		3.0	2.2	11.1	1.9						4.5
-Total	4.4	9.1	1.2	15.3	1.3	4.0	19.0	2.9	1.2	3.6	6.2
+Agriculture, livestock, fishing, forestry	17.6	21.2	19.4	22.2	15.1	14.3	35.7	36.5		10.9	21.4
+Construction	17.6			22.2			14.3	5.8			15.0
+Wholesale / retail trade	38.2	27.3	48.2	38.9	67.9	66.7		34.6	37.5	45.7	45.0
+Other services (repair, personal, arts)		24.2	12.9		7.5	7.1		5.8	12.5	23.9	13.4
+Other							42.9	5.8	24.3		24.3
+Total	24.5	24.2	26.9	27.8	30.2	29.4	31.0	17.7	24.8	26.8	25.8
 
 Analysis 2 - Top 3 aspired sectors in each region: rank (1 = most common)
 P4. Sector of greatest interest	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAFING	BERE	GONTOUGO	BOUNKANI	Total
 	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank
-Agriculture, livestock, fishing, forestry				3			3				3
-Manufacturing		2		1						1	1
-Construction		2		3		2	2			3	2
-Wholesale / retail trade							1				1
-Transport, storage, logistics	1				1	2		1	2		1
-Accommodation and food services					1			3	2		2
-Information, communication, digital								1		1	1
-Finance and insurance						1					1
-Public administration	1		1					3	2		2
-Education			1								1
-Health and social work	3								1		2
-Other services (repair, personal, arts)	3										3
-Other		1	3	2	3						2
+Agriculture, livestock, fishing, forestry	2	3	2	2	2	2	2	1		3	2
+Construction	2			2			3	3			2
+Wholesale / retail trade	1	1	1	1	1	1		2	1	1	1
+Other services (repair, personal, arts)		2	3		3	3		3	3	2	3
+Other							1	3	2		2
 Total	2	2	2	2	2	2	2	2	2	2	2
 
 Analysis 2 - SATURATION RISK: aspired sector chosen by more than 30% of the region's applicants (%)
@@ -210,34 +166,28 @@ Total	106	456	562	100.0%	100.0%	100.0%
 Analysis 2 - Top 3 current sectors in each region: % of the region's employed applicants (blank = not in top 3)
 F2. Sector of main activity	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAFING	BERE	GONTOUGO	BOUNKANI	Total
 	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share	Mean share
-Manufacturing		17.2						4.3	0.8		7.4
-Construction			8.1	7.7	2.2		7.1	4.3		6.8	6.0
-Wholesale / retail trade	5.9	6.9		7.7			7.1				6.9
-Transport, storage, logistics		3.4	4.1		1.1			4.3	0.8	2.3	2.7
+Agriculture, livestock, fishing, forestry	47.1	51.7	61.8	61.5	67.4	83.3	57.1	44.7	32.3	38.6	54.6
+Manufacturing		17.2						4.3			10.7
+Construction	20.6			7.7			7.1	4.3			9.9
+Wholesale / retail trade			13.0	7.7	20.2	4.8	7.1	31.9	28.3	20.5	16.7
+Transport, storage, logistics								4.3			4.3
 Accommodation and food services								4.3			4.3
-Information, communication, digital						2.4					2.4
-Finance and insurance						2.4			0.8		1.6
-Public administration								2.1		2.3	2.2
-Health and social work	2.9										2.9
-Other services (repair, personal, arts)	5.9				4.5	2.4					4.3
-Other			4.1	7.7	4.5		28.6	4.3			9.8
-Total	4.9	9.2	5.4	7.7	3.1	2.4	14.3	3.9	0.8	3.8	5.3
+Other services (repair, personal, arts)		20.7	8.9	15.4	4.5					15.9	13.1
+Other	17.6			7.7	4.5	4.8	28.6	4.3	17.3		12.1
+Total	28.4	29.9	27.9	20.0	24.2	31.0	25.0	14.0	26.0	25.0	23.7
 
 Analysis 2 - Top 3 current sectors in each region: rank (1 = most common)
 F2. Sector of main activity	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAFING	BERE	GONTOUGO	BOUNKANI	Total
 	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank	Mean rank
-Manufacturing		3						2	1		2
-Construction			3	1	2		1	2		3	2
-Wholesale / retail trade	2	2		1			1				2
-Transport, storage, logistics		1	1		1			2	1	1	1
-Accommodation and food services								2			2
-Information, communication, digital						1					1
-Finance and insurance						1			1		1
-Public administration								1		1	1
-Health and social work	1										1
-Other services (repair, personal, arts)	2				3	1					2
-Other			1	1	3		3	2			2
-Total	2	2	2	1	2	1	2	2	1	2	2
+Agriculture, livestock, fishing, forestry	1	1	1	1	1	1	1	1	1	1	1
+Manufacturing		3						3			3
+Construction	2			3			3	3			3
+Wholesale / retail trade			2	3	2	2	3	2	2	2	2
+Transport, storage, logistics								3			3
+Accommodation and food services								3			3
+Other services (repair, personal, arts)		2	3	2	3					3	3
+Other	3			3	3	2	2	3	3		3
+Total	2	2	2	2	2	2	2	3	2	2	2
 
 Analysis 2 - SATURATION RISK: current sector of more than 30% of the region's employed applicants (%)
 F2. Sector of main activity	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAFING	BERE	GONTOUGO	BOUNKANI	Total
@@ -245,21 +195,4 @@ F2. Sector of main activity	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAF
 Agriculture, livestock, fishing, forestry	47.1	51.7	61.8	61.5	67.4	83.3	57.1	44.7	32.3	38.6	54.6
 Wholesale / retail trade								31.9			31.9
 Total	47.1	51.7	61.8	61.5	67.4	83.3	57.1	38.3	32.3	38.6	52.5
-
-Analysis 2 - Current sector (rows) by aspired sector (columns), employed applicants: row %
-F2. Sector of main activity	Agriculture, livestock, fishing, forestry	Manufacturing	Construction	Wholesale / retail trade	Transport, storage, logistics	Accommodation and food services	Information, communication, digital	Finance and insurance	Public administration	Education	Health and social work	Other services (repair, personal, arts)	Other	Total	Agriculture, livestock, fishing, forestry	Manufacturing	Construction	Wholesale / retail trade	Transport, storage, logistics	Accommodation and food services	Information, communication, digital	Finance and insurance	Public administration	Education	Health and social work	Other services (repair, personal, arts)	Other	Total
-	No.	No.	No.	No.	No.	No.	No.	No.	No.	No.	No.	No.	No.	No.	%	%	%	%	%	%	%	%	%	%	%	%	%	%
-Agriculture, livestock, fishing, forestry	89	3	25	134	4	2	1	0	0	0	1	20	18	297	30.0%	1.0%	8.4%	45.1%	1.3%	0.7%	0.3%	0.0%	0.0%	0.0%	0.3%	6.7%	6.1%	100.0%
-Manufacturing	2	3	0	2	0	0	0	0	1	0	0	0	0	8	25.0%	37.5%	0.0%	25.0%	0.0%	0.0%	0.0%	0.0%	12.5%	0.0%	0.0%	0.0%	0.0%	100.0%
-Construction	2	0	21	12	1	0	0	0	0	0	0	1	2	39	5.1%	0.0%	53.8%	30.8%	2.6%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	2.6%	5.1%	100.0%
-Wholesale / retail trade	2	0	1	81	1	1	1	0	3	1	0	5	6	102	2.0%	0.0%	1.0%	79.4%	1.0%	1.0%	1.0%	0.0%	2.9%	1.0%	0.0%	4.9%	5.9%	100.0%
-Transport, storage, logistics	3	0	0	4	4	0	0	0	0	0	0	0	0	11	27.3%	0.0%	0.0%	36.4%	36.4%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	100.0%
-Accommodation and food services	0	0	0	1	0	1	0	0	0	0	0	0	0	2	0.0%	0.0%	0.0%	50.0%	0.0%	50.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	100.0%
-Information, communication, digital	0	0	1	0	0	0	0	0	0	0	0	0	0	1	0.0%	0.0%	100.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	100.0%
-Finance and insurance	0	0	0	1	0	0	0	1	0	0	0	0	0	2	0.0%	0.0%	0.0%	50.0%	0.0%	0.0%	0.0%	50.0%	0.0%	0.0%	0.0%	0.0%	0.0%	100.0%
-Public administration	1	0	0	1	0	0	0	0	0	0	0	0	0	2	50.0%	0.0%	0.0%	50.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	100.0%
-Health and social work	0	0	0	0	0	0	0	0	0	0	1	0	0	1	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	100.0%	0.0%	0.0%	100.0%
-Other services (repair, personal, arts)	1	0	3	9	1	0	0	0	0	0	0	30	1	45	2.2%	0.0%	6.7%	20.0%	2.2%	0.0%	0.0%	0.0%	0.0%	0.0%	0.0%	66.7%	2.2%	100.0%
-Other	1	0	3	11	1	0	0	0	1	0	1	4	30	52	1.9%	0.0%	5.8%	21.2%	1.9%	0.0%	0.0%	0.0%	1.9%	0.0%	1.9%	7.7%	57.7%	100.0%
-Total	101	6	54	256	12	4	2	1	5	1	3	60	57	562	18.0%	1.1%	9.6%	45.6%	2.1%	0.7%	0.4%	0.2%	0.9%	0.2%	0.5%	10.7%	10.1%	100.0%
 
