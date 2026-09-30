@@ -213,15 +213,15 @@ tabout track if dup_id == 0 using "$out/Results.xls", ///
 * hairdressers...). Regions are small: read shares with the counts (3.1, 3.3).
 
 *------------------------------------------------------------------------------*
-* 3.1 Aspired sector (P4, "Other" recoded) by region and by urban/rural
+* 3.1 Aspired sector (P4, Other recoded) by region and by urban/rural
 *------------------------------------------------------------------------------*
 tabout P4_sector B2 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 2 - Aspired sector (P4, "Other" recoded) by region: number and % of the region's applicants")
+    h1("Analysis 2 - Aspired sector (P4, Other recoded) by region: number and % of the region's applicants")
 
 tabout P4_sector B5 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 2 - Aspired sector (P4, "Other" recoded) by urban/rural")
+    h1("Analysis 2 - Aspired sector (P4, Other recoded) by urban/rural")
 
 *------------------------------------------------------------------------------*
 * 3.2 Aspired sector: top 3 per region and saturation risk (> 30%)
