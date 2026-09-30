@@ -6,6 +6,7 @@ Baseline survey data analysis and do files.
 | File | What it does |
 |------|--------------|
 | `do/01_import_clean.do` | Imports `data_exploration.xlsx`, cleans and labels it following `docs/Original Questionnaire_COSO_V5.pdf`, saves the clean dataset |
+| `do/02_track_size.do` | Analysis 1: provisional programme track (A start-up, B enterprise growth, C apprenticeship, undetermined) and track sizes, exported with `tabout` to `$out/Track_size.xls` |
 
 Data problems found during cleaning, and questions for the survey firm, are in `docs/data_issues.md`.
 
