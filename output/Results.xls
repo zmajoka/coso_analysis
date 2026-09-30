@@ -1,0 +1,79 @@
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track	Total	Total	Total	Total
+	No.	No.	%	%
+Track A - Start-up	258	258	41.1%	41.1%
+Track B - Existing enterprise growth	280	280	44.6%	44.6%
+Track C - Apprenticeship to work	4	4	0.6%	0.6%
+Tracks A and C (both apply)	16	16	2.5%	2.5%
+Undetermined	70	70	11.1%	11.1%
+Total	628	628	100.0%	100.0%
+
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)	Total	Total	Total	Total
+	No.	No.	%	%
+No	354	354	56.4%	56.4%
+Yes	274	274	43.6%	43.6%
+Total	628	628	100.0%	100.0%
+
+Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative
+Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)	Total	Total	Total	Total
+	No.	No.	%	%
+No	348	348	55.4%	55.4%
+Yes	280	280	44.6%	44.6%
+Total	628	628	100.0%	100.0%
+
+Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade
+Meets Track C criteria (not employed, aspires to a skilled trade)	Total	Total	Total	Total
+	No.	No.	%	%
+No	608	608	96.8%	96.8%
+Yes	20	20	3.2%	3.2%
+Total	628	628	100.0%	100.0%
+
+Analysis 1 - Undetermined track - reason
+Reason track is undetermined	Total	Total	Total	Total
+	No.	No.	%	%
+Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)	53	53	75.7%	75.7%
+Not employed, had an activity before (closed)	14	14	20.0%	20.0%
+Not employed, no wish to start, aspiration not a skilled trade	3	3	4.3%	4.3%
+Total	70	70	100.0%	100.0%
+
+Analysis 1 - Provisional track by sex
+Provisional programme track	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+Track A - Start-up	183	75	258	43.6%	36.1%	41.1%
+Track B - Existing enterprise growth	166	114	280	39.5%	54.8%	44.6%
+Track C - Apprenticeship to work	4	0	4	1.0%	0.0%	0.6%
+Tracks A and C (both apply)	8	8	16	1.9%	3.8%	2.5%
+Undetermined	59	11	70	14.0%	5.3%	11.1%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 1 - Provisional track by district
+Provisional programme track	DENGUELE	SAVANES	WOROBA	ZANZAN	Total	DENGUELE	SAVANES	WOROBA	ZANZAN	Total
+	No.	No.	No.	No.	No.	%	%	%	%	%
+Track A - Start-up	30	123	34	71	258	44.8%	46.8%	31.5%	37.4%	41.1%
+Track B - Existing enterprise growth	27	96	58	99	280	40.3%	36.5%	53.7%	52.1%	44.6%
+Track C - Apprenticeship to work	1	2	0	1	4	1.5%	0.8%	0.0%	0.5%	0.6%
+Tracks A and C (both apply)	2	5	1	8	16	3.0%	1.9%	0.9%	4.2%	2.5%
+Undetermined	7	37	15	11	70	10.4%	14.1%	13.9%	5.8%	11.1%
+Total	67	263	108	190	628	100.0%	100.0%	100.0%	100.0%	100.0%
+
+Analysis 1 - Provisional track by interview status (Yes = Completed, No = rejected/assigned)
+Provisional programme track	No	Yes	Total	No	Yes	Total
+	No.	No.	No.	%	%	%
+Track A - Start-up	76	182	258	35.5%	44.0%	41.1%
+Track B - Existing enterprise growth	104	176	280	48.6%	42.5%	44.6%
+Track C - Apprenticeship to work	2	2	4	0.9%	0.5%	0.6%
+Tracks A and C (both apply)	8	8	16	3.7%	1.9%	2.5%
+Undetermined	24	46	70	11.2%	11.1%	11.1%
+Total	214	414	628	100.0%	100.0%	100.0%
+
+Analysis 1 - Provisional track - excluding cover_ids with more than one completed interview
+Provisional programme track	Total	Total	Total	Total
+	No.	No.	%	%
+Track A - Start-up	243	243	40.9%	40.9%
+Track B - Existing enterprise growth	269	269	45.3%	45.3%
+Track C - Apprenticeship to work	4	4	0.7%	0.7%
+Tracks A and C (both apply)	14	14	2.4%	2.4%
+Undetermined	64	64	10.8%	10.8%
+Total	594	594	100.0%	100.0%
+
