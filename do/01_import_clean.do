@@ -40,7 +40,7 @@ global cleandata "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\D
 global out   "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output"
 
 capture log close
-log using "$out/01_import_clean.log", replace text
+log using "$out/01_cleaning.log", replace
 
 *------------------------------------------------------------------------------*
 * 1. Import
