@@ -2,16 +2,22 @@
   COSO Youth Employment Program - Côte d'Ivoire
   Baseline phone survey
 
-  File    : 02_track_size.do
-  Purpose : Analysis 1 - estimate the size of each programme track from the
-            applicant baseline, using a provisional track-assignment rule.
+  File    : 02_analysis.do
+  Purpose : All analysis of the applicant baseline, one section per analysis.
 
   Input   : $cleandata/coso_baseline_clean.dta   (from 01_import_clean.do)
-  Outputs : $out/Track_size.xls
-            $out/02_track_size.log
+  Outputs : $out/Results.xls    (all tables, one after the other)
+            $out/02_analysis.log
 
   Sample  : completed surveys only (complete == 1).
 
+  Sections
+    0. Paths
+    1. Data and sample (common to all analyses)
+    2. Analysis 1 - Track size (provisional track assignment)
+
+  ------------------------------------------------------------------------------
+  Analysis 1 - Track size
   Provisional track rule
     Track A - Start-up
         K1 = No (never started an income-generating activity)
@@ -24,8 +30,8 @@
         manufacturing, construction, transport, accommodation/food,
         ICT/digital, other services (repair, personal, arts)
         (no condition on prior training)
-    Tracks A and C can overlap (never employed-with-business, not working,
-    wants to start, aspires to a trade): reported as a separate category.
+    Tracks A and C can overlap (not working, never started an activity,
+    wants to start one, aspires to a trade): reported as a separate category.
     B cannot overlap with A (K1) or C (employment).
     Undetermined - everyone else, split by reason.
 ==============================================================================*/
@@ -44,10 +50,10 @@ global cleandata "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\D
 global out   "C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output"
 
 capture log close
-log using "$out/02_track_size.log", replace text
+log using "$out/02_analysis.log", replace text
 
 *------------------------------------------------------------------------------*
-* 1. Data and sample
+* 1. Data and sample (common to all analyses)
 *------------------------------------------------------------------------------*
 use "$cleandata/coso_baseline_clean.dta", clear
 
@@ -71,8 +77,12 @@ label define total 1 "Total"
 label values total total
 label var total "Total"
 
+*==============================================================================*
+* 2. ANALYSIS 1 - TRACK SIZE
+*==============================================================================*
+
 *------------------------------------------------------------------------------*
-* 2. Track criteria
+* 2.1 Track criteria
 *------------------------------------------------------------------------------*
 * Inputs: spot check
 tab K1, missing
@@ -102,7 +112,7 @@ count if crit_B == 1 & crit_A == 1
 count if crit_B == 1 & crit_C == 1
 
 *------------------------------------------------------------------------------*
-* 3. Provisional track
+* 2.2 Provisional track
 *------------------------------------------------------------------------------*
 gen byte track = 5
 replace track = 1 if crit_A == 1 & crit_C == 0
@@ -148,48 +158,52 @@ tab track employed, missing
 tab track K1, missing
 
 *------------------------------------------------------------------------------*
-* 4. Tables
+* 2.3 Tables
 *------------------------------------------------------------------------------*
 
-* 4.1 Track size
-tabout track total using "$out/Track_size.xls", ///
+* 2.3.1 Track size
+tabout track total using "$out/Results.xls", ///
     replace c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Provisional programme track - completed interviews")
+    h1("Analysis 1 - Provisional programme track - completed interviews")
 
-* 4.2 Criteria met (tracks A and C can overlap)
-tabout crit_A total using "$out/Track_size.xls", ///
+* 2.3.2 Criteria met (tracks A and C can overlap)
+tabout crit_A total using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Meets Track A criteria: never started an activity and wants to start one")
+    h1("Analysis 1 - Meets Track A criteria: never started an activity and wants to start one")
 
-tabout crit_B total using "$out/Track_size.xls", ///
+tabout crit_B total using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Meets Track B criteria: started an activity, now employer/own-account/cooperative")
+    h1("Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative")
 
-tabout crit_C total using "$out/Track_size.xls", ///
+tabout crit_C total using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Meets Track C criteria: not employed, aspires to a skilled trade")
+    h1("Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade")
 
-* 4.3 Why undetermined
-tabout undet_reason total if track == 5 using "$out/Track_size.xls", ///
+* 2.3.3 Why undetermined
+tabout undet_reason total if track == 5 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Undetermined track - reason")
+    h1("Analysis 1 - Undetermined track - reason")
 
-* 4.4 Track by sex and by district
-tabout track C1 using "$out/Track_size.xls", ///
+* 2.3.4 Track by sex and by district
+tabout track C1 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Provisional track by sex")
+    h1("Analysis 1 - Provisional track by sex")
 
-tabout track B1 using "$out/Track_size.xls", ///
+tabout track B1 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Provisional track by district")
+    h1("Analysis 1 - Provisional track by district")
 
-* 4.5 Sensitivity: interview status and duplicate IDs
-tabout track status_ok using "$out/Track_size.xls", ///
+* 2.3.5 Sensitivity: interview status and duplicate IDs
+tabout track status_ok using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Provisional track by interview status (Yes = Completed, No = rejected/assigned)")
+    h1("Analysis 1 - Provisional track by interview status (Yes = Completed, No = rejected/assigned)")
 
-tabout track total if dup_id == 0 using "$out/Track_size.xls", ///
+tabout track total if dup_id == 0 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Provisional track - excluding cover_ids with more than one completed interview")
+    h1("Analysis 1 - Provisional track - excluding cover_ids with more than one completed interview")
+
+*==============================================================================*
+* 3. ANALYSIS 2 - (next analysis goes here; tables use -append-)
+*==============================================================================*
 
 log close
