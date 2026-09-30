@@ -132,7 +132,7 @@ destring interview__status, replace
 *      There is no sub-prefecture. The names are converted to the official
 *      codes of the questionnaire; -noextend- stops the do-file if a name is
 *      not in the official list.
-count if B1 != ""                              // should be 0
+count if !missing(B1)                          // should be 0
 drop B1
 replace B4 = "" if B4 == "."
 
