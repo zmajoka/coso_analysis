@@ -709,6 +709,68 @@ foreach s in A B C D E F G H I J K L M N O P Q R {
     label var dur_`s' "Section `s' duration, minutes"
 }
 
+* 6.10 Sector of the training field (O4) and of "Other" aspired sectors (P4X)
+*      O4 and P4X are free text. Keywords are matched on upper-case text
+*      without accents, in the order below: a later rule overrides an earlier
+*      one (e.g. "CHAUFFEUR D ENGINS AGRICOLE" -> agriculture, not transport).
+*      Codes follow the P4/F2 sector list, plus 97 = could not be classified,
+*      98 = not occupation-specific (e.g. entrepreneurship).
+foreach v in O4 P4X {
+    gen _t = " " + ustrupper(`v') + " "
+    replace _t = subinstr(_t, "É", "E", .)
+    replace _t = subinstr(_t, "È", "E", .)
+    replace _t = subinstr(_t, "Ê", "E", .)
+    replace _t = subinstr(_t, "À", "A", .)
+    replace _t = subinstr(_t, "Â", "A", .)
+    replace _t = subinstr(_t, "Ç", "C", .)
+    replace _t = subinstr(_t, "Î", "I", .)
+    replace _t = subinstr(_t, "Ô", "O", .)
+    replace _t = subinstr(_t, "Û", "U", .)
+
+    gen `v'_sector = 97 if strtrim(`v') != ""
+    * 6 Transport
+    replace `v'_sector = 6  if strpos(_t, "CHAUFFEUR") | strpos(_t, "CONDUCTEUR") | strpos(_t, "TRANSPORT")
+    * 1 Agriculture, livestock, fishing
+    replace `v'_sector = 1  if strpos(_t, "ELEVAGE") | strpos(_t, "ELEVEUR") | strpos(_t, "VOLAILLE") | ///
+        strpos(_t, "POULET") | strpos(_t, "AQUACULTURE") | strpos(_t, "PISCICULT") | ///
+        strpos(_t, "AGRICULT") | strpos(_t, "AGRICOLE") | strpos(_t, "CULTIVAT") | strpos(_t, "LABOUR")
+    * 3 Manufacturing (incl. carpentry)
+    replace `v'_sector = 3  if strpos(_t, "FORGE") | strpos(_t, "MENUIS") | strpos(_t, "MENUSERIE") | ///
+        strpos(_t, "SCIERIE") | strpos(_t, "TAPISSERIE") | strpos(_t, "AGROALIMENTAIRE") | ///
+        strpos(_t, "TRANSFORMATION")
+    * 4 Construction (incl. electrical work)
+    replace `v'_sector = 4  if strpos(_t, "BTP") | strpos(_t, "BATIMENT") | strpos(_t, "MACON") | ///
+        strpos(_t, "CARREL") | strpos(_t, "ELECTRI") | strpos(_t, "PLOMB") | strpos(_t, "PEINT")
+    * 5 Wholesale / retail trade
+    replace `v'_sector = 5  if strpos(_t, "COMMERC") | strpos(_t, "VENTE") | strpos(_t, "VENDEU")
+    * 7 Accommodation and food
+    replace `v'_sector = 7  if strpos(_t, "PATISS") | strpos(_t, "CUISIN") | strpos(_t, "RESTAURA")
+    * 8 Information, communication, digital
+    replace `v'_sector = 8  if strpos(_t, "COMMUNICATION") | strpos(_t, "MARKETING") | strpos(_t, "INFORMATIQUE")
+    * 9 Finance
+    replace `v'_sector = 9  if strpos(_t, "TRANSFERT") | strpos(_t, "COMPTAB")
+    * 14 Other services (repair, personal, arts; incl. metalwork)
+    replace `v'_sector = 14 if strpos(_t, "COUTUR") | strpos(_t, "COIFF") | strpos(_t, "TRESS") | ///
+        strpos(_t, "ESTHETI") | strpos(_t, "ONGLE") | strpos(_t, "MECANI") | strpos(_t, "PHOTO") | ///
+        strpos(_t, "FERRON") | strpos(_t, "FERON")
+    * 98 Not occupation-specific
+    replace `v'_sector = 98 if strpos(_t, "ENTREPREN") | strpos(_t, "ENTREPRENARIAT") | ///
+        strpos(_t, "HUMANITAIRE") | strpos(_t, "SENSIBILISATION") | strpos(_t, "ETAT CIVIL")
+    drop _t
+}
+label var O4_sector  "Sector of the training field (O4 coded)"
+label var P4X_sector "Sector of the 'other' aspired sector (P4X coded)"
+
+* Spot check: what could not be classified
+tab O4 if O4_sector == 97
+tab P4X if P4X_sector == 97
+
+* Aspired sector with the "Other" answers reassigned where P4X names a sector
+gen P4_sector = P4
+replace P4_sector = P4X_sector if P4 == 99 & inrange(P4X_sector, 1, 14)
+label var P4_sector "Aspired sector (P4, with 'Other' recoded from P4X)"
+tab P4 P4_sector if P4 == 99, missing
+
 *------------------------------------------------------------------------------*
 * 7. Value labels (English)
 *------------------------------------------------------------------------------*
@@ -856,7 +918,8 @@ label values C8 C8
 label values D3 D3
 label values E3A E3A
 label values F1 F1
-label values F2 P4 sector
+label define sector 97 "Could not be classified" 98 "Not occupation-specific", add
+label values F2 P4 P4_sector O4_sector P4X_sector sector
 label values F3 F3
 label values F4 F4
 label values G1 G1
