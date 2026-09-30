@@ -45,14 +45,21 @@ log using "$out/01_import_clean.log", replace text
 *------------------------------------------------------------------------------*
 * 1. Import
 *------------------------------------------------------------------------------*
-* Everything is read as text first, so every conversion below is explicit.
-import excel using "$data/data_exploration.xlsx", firstrow case(preserve) allstring clear
+* The header row of the Excel file is misaligned: from B1 onward every value
+* sits one column to the right of its header (the column under "B1" is empty
+* and the last column, assignment__id, has no header). So the header row is
+* not used: columns are read as A, B, C, ... and renamed below in the true
+* order. Everything is read as text, so every conversion below is explicit.
+import excel using "$data/data_exploration.xlsx", allstring clear
+drop in 1                                  // the misaligned header row
 
-* Stops here if a variable is missing or renamed in the export
-confirm variable ///
+* True column order (215 columns). Stops if the file has a different number
+* of columns. B_blank is the empty column under the "B1" header.
+rename (_all) ( ///
     interview__key interview__id cover_id cover_district cover_region localite ///
     HHA_debut A1 A2_date A2_heure A4 A4X A5_date A5_heure HHA_fin              ///
-    HHB_debut B1 B2 B3 B4 B5 B6 B6A B6B B6C B6D B6E B6F consentement B7 HHB_fin ///
+    HHB_debut B_blank B1 B2 B3 B4 B5 B6 B6A B6B B6C B6D B6E B6F consentement   ///
+        B7 HHB_fin                                                              ///
     HHC_debut C1 C2A_Jour C2A_Mois C2A_annee C2 C3 C4 C5 C6 C7 C8 C9 C10 C11  ///
         age HHC_fin                                                             ///
     HHD_debut D1 D2 D3 D3X D4 D5__1 D5__2 D5__3 D5__4 D5__5 D5__6 D5__7       ///
@@ -69,33 +76,43 @@ confirm variable ///
     HHM_debut M1 M2 M3 M4 HHM_fin                                               ///
     HHN_debut N1 N2 N2X N3 N4 N4X N5 N6 N7 HHN_fin                              ///
     HHO_debut O1 O2 O3 O4 O5 O6 HHO_fin                                         ///
-    HHP_debut P1 P2 P3 P4 P44X P5 HHP_fin                                       ///
+    HHP_debut P1 P2 P3 P4 P4X P5 HHP_fin                                        ///
     HHQ_debut Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 Q10 HHQ_fin                            ///
     HHR_debut R1 R1A R2 R2A R3 R3A R3B R4 R5 R6 R7 HHR_fin                      ///
-    sssys_irnd has__errors interview__status assignment__id, exact
+    sssys_irnd has__errors interview__status assignment__id )
+* (P4X is called P44X in the questionnaire; renamed here)
+
+* The empty column must really be empty
+count if B_blank != ""                     // should be 0
+drop B_blank
 
 * Drop fully empty rows that Excel sometimes carries
 drop if strtrim(interview__key) == ""
 isid interview__key
 
-* The questionnaire variable for "P4 - other sector" is misnamed P44X
-rename P44X P4X
-
 di as txt "Observations imported: " as res _N
 
 *------------------------------------------------------------------------------*
-* 2. Text clean-up and "respondent hung up" (all variables are text here)
+* 2. Text clean-up (all variables are text here)
 *------------------------------------------------------------------------------*
+* Survey Solutions writes "." (not asked) for categorical questions and
+* "##N/A##" for empty timestamps: both become "".
 gen byte hungup_any = 0
 
 foreach v of varlist interview__key-assignment__id {
     quietly replace `v' = stritrim(strtrim(`v'))
-    quietly replace `v' = "" if `v' == "##N/A##"
-    quietly replace hungup_any = 1 if `v' == "-95" | strpos(lower(`v'), "raccroch") > 0
+    quietly replace `v' = "" if `v' == "##N/A##" | `v' == "."
+    quietly replace hungup_any = 1 if `v' == "-95"
+}
+
+* "Répondant a raccroché" typed in an open-text question -> hung up, blank.
+* (Only open-text questions: A4 has a category "Le répondant a raccroché".)
+foreach v in A4X C9 C10 C11 D3X F1X F2X F3X G5A I2X I3X J1X K3X K4X K5X ///
+             L5X L7X N2X N4X O4 P1 P4X P5 {
+    quietly replace hungup_any = 1 if strpos(lower(`v'), "raccroch") > 0
     quietly replace `v' = "" if strpos(lower(`v'), "raccroch") > 0
 }
-* (-95 in numeric questions becomes .h in section 4; in text questions it is
-*  blanked in section 4 too)
+* (-95 in other questions becomes .h in section 4)
 
 tab hungup_any
 
@@ -103,41 +120,40 @@ tab hungup_any
 * 3. Variable types
 *------------------------------------------------------------------------------*
 
-* 3.1 Numeric questions.
+* 3.1 Numeric questions
+*     Special answers are exported as text: put back the questionnaire codes
+*     (they become .d / .r in section 4).
+replace C2A_Jour  = "98"     if C2A_Jour  == "Ne sait pas"
+replace C2A_Mois  = "98"     if C2A_Mois  == "Ne sait pas"
+replace C2A_annee = "9998"   if C2A_annee == "Ne sait pas"
+replace G3        = "998"    if G3        == "Ne sait pas"
+replace H3        = "99999"  if H3        == "Ne veut pas dire"
+replace H5        = "999999" if H5        == "Ne veut pas dire"
+replace L4        = "999998" if L4        == "Ne sait pas / ça varie"
+replace L8        = "99998"  if L8        == "Ne sait pas"
+
 *     Check the output: a line "contains nonnumeric characters; no replace"
 *     means that variable has text values that must be looked at.
-destring A1 A4 B6 B6A B6B B6D B6E consentement                            ///
-    C1 C2A_Jour C2A_Mois C2A_annee C2 C3 C4 C5 C6 C7 C8 age                 ///
-    D1 D2 D3 D4 D5__1 D5__2 D5__3 D5__4 D5__5 D5__6 D5__7 D5__8 D5__9       ///
-    D5__10 D5__11 E1 E2 E3 E3A EMPLOYE F1 F2 F3 F4                          ///
-    G1 G2 G3 G4 G4A G5 G6 G7 G7A H1 H2 H3 H3A H4 H4A H5 H5A                 ///
-    I1 I2 I3 J0 J0A J0B J1 J2 J3                                            ///
-    K1 K2 K3 K4 K5__1 K5__2 K5__3 K5__4 K5__5 K5__6 K5__7 K5__9 K6 K7       ///
-    L1 L2 L3 L4 L5 L6 L7 L8 L9 M1 M2 M3 M4 N1 N2 N3 N4 N5 N6 N7             ///
-    O1 O2 O3 O5 O6 P2 P3 P4 Q1 Q3 Q4 Q5 Q6 Q7 Q8 Q9 Q10                     ///
-    R1 R2 R3 R3A R5 R7 sssys_irnd has__errors, replace
+destring consentement C2A_Jour C2A_Mois C2A_annee C2 age D1 D2 D4       ///
+    D5__1 D5__2 D5__3 D5__4 D5__5 D5__6 D5__7 D5__8 D5__9 D5__10 D5__11 ///
+    EMPLOYE G3 G4A G6 H3 H4A H5                                         ///
+    K5__1 K5__2 K5__3 K5__4 K5__5 K5__6 K5__7 K5__9                     ///
+    L4 L8 N7 O2 P3 sssys_irnd has__errors, replace
 
 * Q2 (times volunteered) is a TEXT question in CAPI but asks for a count.
 * Values that are not numbers are listed, then set to missing.
 tab Q2 if missing(real(Q2)) & Q2 != ""
 destring Q2, replace force
 
-* interview__status is converted only if exported as a code (e.g. 100);
-* if exported as text (e.g. "Completed") it stays text.
-destring interview__status, replace
+* interview__status is exported as text (e.g. "Completed"); it stays text.
 
-* 3.1b Geography
-*      In this export B1-B5 do not match the questionnaire:
-*        B1 = empty, B2 = district NAME, B3 = region NAME,
-*        B4 = department NAME, B5 = sub-prefecture NAME
-*      The names are converted to the official
-*      codes of the questionnaire; -noextend- stops the do-file if a name is
-*      not in the official list.
-count if !missing(B1)                          // should be 0
-drop B1
-replace B4 = "" if B4 == "."
-replace B5 = "" if B5 == "."
+* 3.2 Categorical questions: exported as French answer text -> codes.
+*     Each question gets a French label with the exact questionnaire wording
+*     and codes; -noextend- stops the do-file if an answer text does not
+*     match. If it stops, run -tab <variable>- and compare with the label.
+*     (English labels replace the French ones in section 7.)
 
+* Geography (official codes of the questionnaire)
 label define district ///
     105 "DENGUELE" ///
     111 "SAVANES" ///
@@ -192,8 +208,6 @@ label define dept ///
     11423076 "DOROPO" ///
     11423091 "TEHINI"
 
-encode B2, gen(district)   label(district) noextend
-encode B3, gen(region)     label(region)   noextend
 label define souspref ///
     1051003401 "BAKO" ///
     1051003402 "BOUGOUSSO" ///
@@ -351,23 +365,187 @@ label define souspref ///
     1142309101 "GOGO" ///
     1142309102 "TEHINI" ///
     1142309103 "TOUGBO"
+label copy district fr_B1
+label copy region   fr_B2
+label copy dept     fr_B3
+label copy souspref fr_B4
+label define fr_B5 1 "Urbain" 2 "Rural"
 
-encode B4, gen(department) label(dept)     noextend
-encode B5, gen(subpref)    label(souspref) noextend
-order district region department subpref, after(HHB_debut)
-drop B2 B3 B4 B5
+* Yes/No
+label define fr_yesno 1 "Oui" 2 "Non"
 
-* 3.2 Timestamps (Survey Solutions "current time") -> Stata %tc
-*     Reads 2026-08-10T09:15:32, 10/08/2026 09:15:32, or an Excel serial number.
+* Other questions
+label define fr_A1 1 "Première tentative" 2 "Deuxième tentative"             ///
+    3 "Troisième tentative ou plus"
+label define fr_A4 1 "Entretien réalisé (compléter le questionnaire)"        ///
+    2 "Pas de réponse" 3 "Numéro invalide ou incorrect" 4 "Ligne occupée"    ///
+    5 "Rendez-vous fixé pour un rappel" 6 "Le répondant a refusé de participer" ///
+    7 "Le répondant a raccroché / appel interrompu en cours d’entretien"      ///
+    8 "Autre (préciser)"
+label define fr_C1 1 "Homme" 2 "Femme"
+label define fr_C3 1 "Célibataire" 2 "Marié(e) monogame" 3 "Marié(e) polygame" ///
+    4 "Union libre/Concubinage" 5 "Divorcé(e)" 6 "Veuf(ve)"
+label define fr_C4 0 "Aucun niveau" 1 "Préscolaire" 2 "Primaire"             ///
+    3 "Secondaire général cycle I"                                           ///
+    4 "Secondaire technique/professionnel cycle I"                           ///
+    5 "Secondaire général cycle II"                                          ///
+    6 "Secondaire technique/professionnel cycle II"                          ///
+    7 "Supérieur cycle court (BAC+ 1; BP; BTS1; BAC+2; BTS2; DUT)"           ///
+    8 "Licence" 9 "Maitrise/ Master 1" 10 "Master 2/DEA/DESS" 11 "Doctorat"  ///
+    12 "Post Doctorat"
+label define fr_C5 1 "AUCUN" 2 "CEPE" 3 "BEPC/BEP/CAP" 4 "BAC/BT" 5 "BTS/DEUG 2" ///
+    6 "LICENCE/BACHELOR" 7 "MASTER/DESS" 8 "DOCTORATS"
+label define fr_C8 1 "Côte d’Ivoire" 2 "Hors Côte d'Ivoire"
+label define fr_D3 1 "Chef de ménage" 2 "Conjoint du CM" 3 "Enfant du CM"    ///
+    4 "Autre parent du CM" 5 "Sans lien de parenté avec le CM" 6 "Amis du CM" ///
+    7 "Autre à préciser"
+label define fr_E3A 1 "Principalement à la vente"                           ///
+    2 "Principalement à l'usage du ménage"
+label define fr_F1 1 "Salarié" 2 "Employeur (avec employés)"                ///
+    3 "Travailleur indépendant / à compte propre (sans employés)"            ///
+    4 "Membre de coopératives de producteurs"                                ///
+    5 "Travailleurs familiaux collaborant à l’entreprise familiale"          ///
+    7 "Apprenti/Stagiaire" 9 "Autre (Précisez)"
+label define fr_F2 1 "Agriculture, élevage, pêche, sylviculture"            ///
+    2 "Industries extractives" 3 "Industrie manufacturière"                  ///
+    4 "Construction/BTP" 5 "Commerce de gros ou de détail"                   ///
+    6 "Transport, entreposage, logistique" 7 "Hébergement et restauration"   ///
+    8 "Information, communication, services numériques"                      ///
+    9 "Activités financières et d’assurance" 10 "Administration publique"   ///
+    11 "Éducation" 12 "Santé humaine et action sociale"                       ///
+    13 "Travail domestique chez un particulier"                               ///
+    14 "Autres services (réparation, services personnels, arts/spectacles)"  ///
+    99 "Autre (préciser)"
+label copy fr_F2 fr_P4
+label define fr_F3 1 "À domicile" 2 "Dans une structure attenante/proche du domicile" ///
+    3 "Au domicile de l’employeur"                                           ///
+    4 "Lieu fixe hors domicile, en intérieur (bureau, magasin, usine)"       ///
+    5 "Étal/emplacement fixe dans un espace public (stand de marché, kiosque, emplacement de vente autorisé)" ///
+    6 "Chantier de construction" 7 "Champ/exploitation agricole"             ///
+    8 "Mobile/sans emplacement fixe (vente itinérante, porte-à-porte)"       ///
+    9 "Autre (préciser)"
+label define fr_F4 1 "Moins de 6 mois" 2 "6 mois à moins d’un an"           ///
+    3 "1 an à moins de 2 ans" 4 "2 ans à moins de 5 ans" 5 "5 ans ou plus"
+label define fr_G1 1 "Oui, à durée indéterminée (CDI)"                      ///
+    2 "Oui, à durée déterminée (CDD)" 3 "Oui, consultance"                   ///
+    4 "Accord verbal seulement" 5 "Aucun accord"
+label define fr_H1 1 "En espèces uniquement" 2 "En nature uniquement" 3 "Les deux"
+label define fr_H2 1 "Quotidienne/Jour" 2 "Hebdomadaire/Semaine"             ///
+    3 "Quinzaine/Toutes les deux semaines" 4 "Mensuelle/Mois"                ///
+    5 "Bimestre/Tous les deux mois" 6 "Trimestre/Tous les trois mois"        ///
+    7 "Semestre/Tous les six mois" 8 "Année" 9 "Irrégulière" 10 "Ne veut pas dire"
+label define fr_H3A 1 "Moins de 30 000" 2 "[30 000 - 75 000[" 3 "[75 000 - 150 000[" ///
+    4 "[150 000 - 300 000[" 5 "[300 000 - 500 000[" 6 "[500 000 - 800 000[" ///
+    7 "[800 000 - 1 000 000[" 8 "Plus d'un million"
+label copy fr_H3A fr_H5A
+label define fr_H4 1 "Oui" 2 "Non" 3 "Ne sait pas"
+label define fr_I2 1 "Revenu insuffisant dans l’emploi actuel"              ///
+    2 "Emploi actuel instable/temporaire"                                    ///
+    3 "Je veux un emploi qui correspond mieux à mes compétences"             ///
+    4 "Je veux simplement un meilleur emploi" 5 "Autre"
+label define fr_I3 1 "Candidature spontanée auprès d’employeurs"            ///
+    2 "Réponse à une offre d’emploi (en ligne, journal, affiche)"            ///
+    3 "Inscription auprès d’une agence (Agence Emploi Jeunes, etc.)"         ///
+    4 "Réseau personnel (famille, amis)" 5 "Concours/test pour le secteur public" ///
+    6 "Démarches pour créer sa propre entreprise" 9 "Autre"
+label copy fr_I3 fr_J1
+label define fr_J0A 1 "Vous ne pensiez pas en trouver, vous étiez découragé(e)" ///
+    2 "Vous pensiez qu'il n'y avait pas d'emploi disponible correspondant à vos compétences dans votre zone" ///
+    3 "Vous suiviez (ou aviez le projet de suivre) des études ou une formation" ///
+    4 "Problèmes de santé ou situation de handicap"                          ///
+    5 "Obligations familiales (enfants, proches)"                            ///
+    6 "Vous attendiez le début de la saison agricole"                        ///
+    7 "Vous attendiez le résultat de démarches antérieures (emploi, concours, programme)" ///
+    8 "Vous avez déjà trouvé un emploi ou une activité qui commencera dans les trois prochains mois" ///
+    9 "Autre (préciser)"
+label define fr_J2 1 "Moins d’1 mois" 2 "1 mois à moins de 3 mois"           ///
+    3 "3 mois à moins de 6 mois" 4 "6 mois à moins de 12 mois"               ///
+    5 "1 an à moins de 2 ans" 6 "2 ans ou plus"
+label define fr_K3 1 "Épargne personnelle" 2 "Aide familiale"                ///
+    3 "Microfinance/coopérative d’épargne (COOPEC)"                          ///
+    4 "Programme gouvernemental (AGR/Agence Emploi Jeunes)" 5 "Prêt bancaire" ///
+    6 "ONG/organisation humanitaire" 9 "Autre"
+label copy fr_K3 fr_K4
+label define fr_K4 7 "Ne sait pas", add
+label define fr_K7 1 "Très faibles" 2 "Faibles" 3 "Moyennes" 4 "Bonnes" 5 "Très bonnes"
+label define fr_L3 1 "Oui, régulièrement" 2 "Oui, occasionnellement" 3 "Non, jamais"
+label define fr_L5 1 "Domicile (cash)" 2 "Tontine/AVEC" 3 "Compte bancaire"  ///
+    4 "Mobile money" 5 "Autres (à préciser)"
+label define fr_L7 1 "Banque" 2 "Institution de microfinance/COOPEC"         ///
+    3 "Crédit mobile money" 4 "Tontine/AVEC" 5 "Famille ou amis" 6 "Employeur" ///
+    7 "Prêteur informel" 9 "Autre"
+label define fr_L9 1 "Démarrer ou développer une activité"                  ///
+    2 "Couvrir des besoins quotidiens/du ménage" 3 "Éducation/frais de scolarité" ///
+    4 "Santé/dépenses médicales" 5 "Logement" 9 "Autre"
+label define fr_M1 1 "Je dépends principalement de l’aide d’autrui"         ///
+    2 "Je me prends en charge pour certains de mes besoins"                  ///
+    3 "Je suis capable de me prendre en charge complètement"
+label copy fr_M1 fr_M4
+label define fr_M2 1 "Oui, régulièrement" 2 "Oui, ponctuellement" 3 "Non, jamais"
+label define fr_M3 1 "Pas du tout d’accord" 2 "Plutôt pas d’accord" 3 "Neutre" ///
+    4 "Plutôt d’accord" 5 "Tout à fait d’accord"
+label define fr_N2 1 "Maladie/accident" 2 "Choc climatique (sécheresse, inondation)" ///
+    3 "Perte d'activité/emploi" 4 "Décès d'un membre du ménage"              ///
+    5 "Catastrophe naturelle" 9 "Autre (préciser)"
+label define fr_N3 1 "Aucun impact" 2 "Impact limité, vite surmonté"          ///
+    3 "Impact important, encore en cours de redressement"                    ///
+    4 "Impact très important, activité arrêtée ou fortement réduite"
+label define fr_N4 1 "Épargne personnelle" 2 "Vente d'actifs/biens"          ///
+    3 "Emprunt/crédit" 4 "Aide familiale ou communautaire"                   ///
+    5 "Aide externe (ONG, État)" 6 "Réduction de la consommation" 9 "Autre"
+label define fr_N5 1 "Moins d'1 mois" 2 "1 à 3 mois" 3 "3 à 6 mois"          ///
+    4 "Plus de 6 mois" 5 "Pas encore rétabli"
+label define fr_N6 1 "Oui, facilement" 2 "Oui, avec difficulté" 3 "Non, impossible"
+label define fr_O5 1 "École/centre de formation professionnelle formel"     ///
+    2 "Employeur/entreprise privée"                                          ///
+    3 "Programme gouvernemental (ex. Agence Emploi Jeunes)"                  ///
+    4 "ONG/programme d’alphabétisation ou de compétences de vie"             ///
+    5 "Apprentissage informel (famille/membre de la communauté)"             ///
+    6 "Apprentissage sur le tas/au travail" 9 "Autre"
+label define fr_O6 1 "Pas utile" 2 "Plutôt utilie" 3 "Très utile"
+label define fr_P2 1 "Trouver un emploi salarié" 2 "Créer une entreprise"   ///
+    3 "Développer une activité existante"
+label define fr_Q3 1 "On peut faire confiance à la plupart des gens"        ///
+    2 "Il faut être prudent"
+label define fr_Q4 1 "Pas du tout confiance" 2 "Juste un peu confiance"      ///
+    3 "Partiellement confiance" 4 "Beaucoup confiance" 9 "Ne sait pas"
+label copy fr_Q4 fr_Q5
+label copy fr_Q4 fr_Q6
+label copy fr_Q4 fr_Q7
+label copy fr_Q4 fr_Q8
+label copy fr_Q4 fr_Q9
+label copy fr_Q4 fr_Q10
+label define fr_R7 1 "Vous-même" 2 "Un parent" 3 "Un ami/connaissance"
+
+* Convert: yes/no questions
+foreach v in B6 B6A B6B B6D B6E C6 C7 E1 E2 E3 G2 G4 G5 G7 G7A I1 J0 ///
+             J0B J3 K1 K2 K6 L1 L2 L6 N1 O1 O3 Q1 R1 R2 R3 R3A R5 {
+    encode `v', gen(`v'_n) label(fr_yesno) noextend
+    order `v'_n, after(`v')
+    drop `v'
+    rename `v'_n `v'
+}
+
+* Convert: all other categorical questions (label fr_<variable>)
+foreach v in B1 B2 B3 B4 B5 A1 A4 C1 C3 C4 C5 C8 D3 E3A F1 F2 F3 F4 G1 ///
+             H1 H2 H3A H4 H5A I2 I3 J0A J1 J2 K3 K4 K7 L3 L5 L7 L9      ///
+             M1 M2 M3 M4 N2 N3 N4 N5 N6 O5 O6 P2 P4 Q3 Q4 Q5 Q6 Q7 Q8  ///
+             Q9 Q10 R7 {
+    encode `v', gen(`v'_n) label(fr_`v') noextend
+    order `v'_n, after(`v')
+    drop `v'
+    rename `v'_n `v'
+}
+
+* 3.3 Timestamps (Survey Solutions "current time", e.g. 2026-08-13T11:20:08)
+*     -> Stata %tc
 foreach v in HHA_debut HHA_fin HHB_debut HHB_fin HHC_debut HHC_fin            ///
              HHD_debut HHD_fin HHE_debut HHE_fin HHF_debut HHF_fin            ///
              HHG_debut HHG_fin HHH_debut HHH_fin HHI_debut HHI_fin            ///
              HHJ_debut HHJ_fin HHK_debut HHK_fin HHL_debut HHL_fin            ///
              HHM_debut HHM_fin HHN_debut HHN_fin HHO_debut HHO_fin            ///
-             HHP_debut HHP_fin HHQ_debut HHQ_fin HHR_debut HHR_fin A5_heure {
+             HHP_debut HHP_fin HHQ_debut HHQ_fin HHR_debut HHR_fin {
     gen double `v'_c = clock(substr(subinstr(`v', "T", " ", 1), 1, 19), "YMDhms")
-    replace `v'_c = clock(`v', "DMYhms") if missing(`v'_c)
-    replace `v'_c = round((real(`v') + td(30dec1899)) * 86400000) if missing(`v'_c)
     count if missing(`v'_c) & `v' != ""        // should be 0
     format `v'_c %tcDD/NN/CCYY_HH:MM:SS
     order `v'_c, after(`v')
@@ -375,11 +553,10 @@ foreach v in HHA_debut HHA_fin HHB_debut HHB_fin HHC_debut HHC_fin            //
     rename `v'_c `v'
 }
 
-* 3.3 Dates -> Stata %td
-foreach v in A2_date A5_date B6C B6F {
-    gen `v'_c = date(substr(`v', 1, 10), "YMD")
-    replace `v'_c = date(substr(`v', 1, 10), "DMY") if missing(`v'_c)
-    replace `v'_c = floor(real(`v')) + td(30dec1899) if missing(`v'_c)
+* 3.4 Dates (exported month/day/year, e.g. 8/13/2026) -> Stata %td
+*     A5_heure is a DATE question in CAPI (despite its name): read as a date.
+foreach v in A2_date A5_date A5_heure B6C B6F {
+    gen `v'_c = date(substr(`v', 1, 10), "MDY")
     count if missing(`v'_c) & `v' != ""        // should be 0
     format `v'_c %tdDD/NN/CCYY
     order `v'_c, after(`v')
@@ -387,7 +564,8 @@ foreach v in A2_date A5_date B6C B6F {
     rename `v'_c `v'
 }
 
-* 3.4 What is still text should be only the open-ended / ID variables
+* 3.5 What is still text should be only the open-ended / ID variables
+*     (plus A2_heure, typed by the interviewer, and interview__status)
 ds, has(type string)
 
 *------------------------------------------------------------------------------*
@@ -642,6 +820,14 @@ label define status -1 "Deleted" 0 "Restored" 20 "Created"                 ///
     95 "Restarted" 100 "Completed" 120 "ApprovedBySupervisor"                ///
     125 "RejectedByHeadquarters" 130 "ApprovedByHeadquarters"
 
+label define B5 1 "Urban" 2 "Rural"
+
+* Drop the French labels used for importing (section 3.2)
+label dir
+foreach l in `r(names)' {
+    if substr("`l'", 1, 3) == "fr_" label drop `l'
+}
+
 * Add the extended-missing labels to every value label
 label dir
 foreach l in `r(names)' {
@@ -650,6 +836,11 @@ foreach l in `r(names)' {
 }
 
 * Attach value labels
+label values B1 district
+label values B2 region
+label values B3 dept
+label values B4 souspref
+label values B5 B5
 label values B6 B6A B6B B6D B6E C6 C7 E1 E2 E3 G2 G4 G5 G7 G7A H4 I1 J0 ///
     J0B J3 K1 K2 K6 L1 L2 L6 N1 O1 O3 Q1 R1 R2 R3 R3A R5 yesno
 label values D5__* K5__* yesno
@@ -732,10 +923,11 @@ label var A5_date  "A5. Planned date of next attempt"
 label var A5_heure "A5. Planned time of next attempt"
 
 * B. Identification and consent
-label var district   "District (B2 in export)"
-label var region     "Region (B3 in export)"
-label var department "Department (B4 in export)"
-label var subpref    "Sub-prefecture / commune (B5 in export)"
+label var B1  "B1. District"
+label var B2  "B2. Region"
+label var B3  "B3. Department"
+label var B4  "B4. Sub-prefecture / commune"
+label var B5  "B5. Area of residence"
 label var B6  "B6. Speaking to the intended respondent"
 label var B6A "B6A. Can speak to the respondent"
 label var B6B "B6B. Agrees to a callback (respondent unavailable)"
@@ -970,12 +1162,12 @@ gen byte flag_skip_emp = (employed == 1 & !missing(J0)) | ///
                          (employed == 0 & !missing(F1)) if !missing(employed)
 label var flag_skip_emp "Employed answered section J, or non-employed answered F"
 
-decode district, gen(_dist)
-decode region, gen(_reg)
-gen byte flag_geo = 0 if !missing(district)
-replace flag_geo = 1 if !missing(district) & cover_district != "" & ///
+decode B1, gen(_dist)
+decode B2, gen(_reg)
+gen byte flag_geo = 0 if !missing(B1)
+replace flag_geo = 1 if !missing(B1) & cover_district != "" & ///
     upper(cover_district) != upper(strtrim(_dist))
-replace flag_geo = 1 if !missing(region) & cover_region != "" & ///
+replace flag_geo = 1 if !missing(B2) & cover_region != "" & ///
     upper(cover_region) != upper(strtrim(_reg))
 drop _dist _reg
 label var flag_geo "Reported district/region differs from cover"
@@ -983,12 +1175,9 @@ label var flag_geo "Reported district/region differs from cover"
 * Official codes are nested: region 11103 is in district 111,
 * department 11103029 is in region 11103, sub-prefecture 1110302906 is in
 * department 11103029
-gen byte flag_geo_nest = (floor(region / 100) != district) ///
-    if !missing(region, district)
-replace flag_geo_nest = 1 if floor(department / 1000) != region ///
-    & !missing(department, region)
-replace flag_geo_nest = 1 if floor(subpref / 100) != department ///
-    & !missing(subpref, department)
+gen byte flag_geo_nest = (floor(B2 / 100) != B1) if !missing(B1, B2)
+replace flag_geo_nest = 1 if floor(B3 / 1000) != B2 & !missing(B2, B3)
+replace flag_geo_nest = 1 if floor(B4 / 100) != B3 & !missing(B3, B4)
 label var flag_geo_nest "Region/department/sub-prefecture not nested in the level above"
 
 gen byte flag_short = (dur_total < 10) if complete == 1 & !missing(dur_total)
