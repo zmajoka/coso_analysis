@@ -106,7 +106,7 @@ tab hungup_any
 * 3.1 Numeric questions.
 *     Check the output: a line "contains nonnumeric characters; no replace"
 *     means that variable has text values that must be looked at.
-destring A1 A4 B5 B6 B6A B6B B6D B6E consentement                         ///
+destring A1 A4 B6 B6A B6B B6D B6E consentement                            ///
     C1 C2A_Jour C2A_Mois C2A_annee C2 C3 C4 C5 C6 C7 C8 age                 ///
     D1 D2 D3 D4 D5__1 D5__2 D5__3 D5__4 D5__5 D5__6 D5__7 D5__8 D5__9       ///
     D5__10 D5__11 E1 E2 E3 E3A EMPLOYE F1 F2 F3 F4                          ///
@@ -127,14 +127,16 @@ destring Q2, replace force
 destring interview__status, replace
 
 * 3.1b Geography
-*      In this export B1-B4 do not match the questionnaire:
-*        B1 = empty, B2 = district NAME, B3 = region NAME, B4 = department NAME
-*      There is no sub-prefecture. The names are converted to the official
+*      In this export B1-B5 do not match the questionnaire:
+*        B1 = empty, B2 = district NAME, B3 = region NAME,
+*        B4 = department NAME, B5 = sub-prefecture NAME
+*      The names are converted to the official
 *      codes of the questionnaire; -noextend- stops the do-file if a name is
 *      not in the official list.
 count if !missing(B1)                          // should be 0
 drop B1
 replace B4 = "" if B4 == "."
+replace B5 = "" if B5 == "."
 
 label define district ///
     105 "DENGUELE" ///
@@ -192,9 +194,168 @@ label define dept ///
 
 encode B2, gen(district)   label(district) noextend
 encode B3, gen(region)     label(region)   noextend
+label define souspref ///
+    1051003401 "BAKO" ///
+    1051003402 "BOUGOUSSO" ///
+    1051003403 "DIOULATIEDOUGOU" ///
+    1051003404 "ODIENNE" ///
+    1051003405 "TIEME" ///
+    1051006701 "FENGOLO" ///
+    1051006702 "MADINANI" ///
+    1051006703 "N'GOLOBLASSO" ///
+    1051008801 "KIMBIRILA-SUD" ///
+    1051008802 "SAMATIGUILA" ///
+    1051010001 "GBELEBAN" ///
+    1051010002 "SEYDOUGOU" ///
+    1051010003 "SAMANGO" ///
+    1051010501 "GBONGAHA" ///
+    1051010502 "SEGUELON" ///
+    1052406801 "KIMBIRILA-NORD" ///
+    1052406802 "MINIGNAN" ///
+    1052406803 "SOKORO" ///
+    1052406804 "TIENKO" ///
+    1052408101 "GOULIA" ///
+    1052408102 "KANIASSO" ///
+    1052408103 "MAHANDIANA-SOKOURANI" ///
+    1110302901 "DASSOUNGBOHO" ///
+    1110302902 "KANOROBA" ///
+    1110302903 "KARAKORO" ///
+    1110302904 "KIEMOU" ///
+    1110302905 "KONI" ///
+    1110302906 "KORHOGO" ///
+    1110302907 "KOMBOLOKOURA" ///
+    1110302908 "KOMBORODOUGOU" ///
+    1110302909 "LATAHA" ///
+    1110302910 "NAFOUN" ///
+    1110302911 "NAPIE" ///
+    1110302912 "N'GANON" ///
+    1110302913 "NIOFOIN" ///
+    1110302914 "SIRASSO" ///
+    1110302915 "SOHOUO" ///
+    1110302916 "TIORONIARADOUGOU" ///
+    1110307501 "BORON" ///
+    1110307502 "DIKODOUGOU" ///
+    1110307503 "GUIEMBE" ///
+    1110309001 "BAHOUAKAHA" ///
+    1110309002 "KAGBOLODOUGOU" ///
+    1110309003 "SEDIOGO" ///
+    1110309004 "SINEMATIALI" ///
+    1110310301 "BOUGOU" ///
+    1110310302 "KATIALI" ///
+    1110310303 "KATOGO" ///
+    1110310304 "M'BENGUE" ///
+    1112001501 "BAYA" ///
+    1112001502 "BOUNDIALI" ///
+    1112001503 "GANAONI" ///
+    1112001504 "KASSERE" ///
+    1112001505 "SIEMPURGO" ///
+    1112004401 "DEBETE" ///
+    1112004402 "KANAKONO" ///
+    1112004403 "PAPARA" ///
+    1112004404 "TENGRELA" ///
+    1112008301 "BLESSEGUE" ///
+    1112008302 "GBON" ///
+    1112008303 "KOLIA" ///
+    1112008304 "KOUTO" ///
+    1112008305 "SIANHALA" ///
+    1113202301 "FERKESSEDOUGOU" ///
+    1113202302 "KOUMBALA" ///
+    1113202303 "TOGONIERE" ///
+    1113208601 "DIAWALA" ///
+    1113208602 "KAOUARA" ///
+    1113208603 "NIELLE" ///
+    1113208604 "OUANGOLODOUGOU" ///
+    1113208605 "TOUMOUKORO" ///
+    1113210101 "BILIMONO" ///
+    1113210102 "KONG" ///
+    1113210103 "NAFANA(DE KONG)" ///
+    1113210104 "SIKOLO" ///
+    1131403901 "BOBI" ///
+    1131403902 "DIARABANA" ///
+    1131403903 "DUALLA" ///
+    1131403904 "KAMALO" ///
+    1131403905 "MASSALA" ///
+    1131403906 "SEGUELA" ///
+    1131403907 "SIFIE" ///
+    1131403908 "WOROFLA" ///
+    1131408001 "DJIBROSSO" ///
+    1131408002 "FADIADOUGOU" ///
+    1131408003 "KANI" ///
+    1131408004 "MORONDO" ///
+    1131904601 "DIOMAN" ///
+    1131904602 "FOUNGBESSO" ///
+    1131904603 "GUINTEGUELA" ///
+    1131904604 "TOUBA" ///
+    1131908201 "BOOKO" ///
+    1131908202 "BOROTOU" ///
+    1131908203 "KORO" ///
+    1131908204 "MAHANDOUGOU" ///
+    1131908205 "NIOKOSSO" ///
+    1131908701 "GBELO" ///
+    1131908702 "GOUEKAN" ///
+    1131908703 "KOONAN" ///
+    1131908704 "OUANINOU" ///
+    1131908705 "SABOUDOUGOU" ///
+    1131908706 "SANTA (DE OUANINOU)" ///
+    1132203201 "BOUANDOUGOU" ///
+    1132203202 "MANKONO" ///
+    1132203203 "MARHANDALLAH" ///
+    1132203204 "SARHALA" ///
+    1132203205 "TIENINGBOUE" ///
+    1132206901 "KONGASSO" ///
+    1132206902 "KOUNAHIRI" ///
+    1132209701 "DIANRA" ///
+    1132209702 "DIANRA VILLAGE" ///
+    1140801001 "APPIMANDOUM" ///
+    1140801002 "PINDA-BOROKO" ///
+    1140801003 "BONDO" ///
+    1140801004 "BONDOUKOU" ///
+    1140801005 "GOUMERE" ///
+    1140801006 "LAOUDI BA" ///
+    1140801007 "SAPLI-SEPINGO" ///
+    1140801008 "SOROBANGO" ///
+    1140801009 "TABAGNE" ///
+    1140801010 "TAGADI" ///
+    1140801011 "TAOUDI" ///
+    1140801012 "YEZIMALA" ///
+    1140804301 "AMANVI" ///
+    1140804302 "DIAMBA" ///
+    1140804303 "TANDA" ///
+    1140804304 "TIEDIO" ///
+    1140807001 "BOAHIA" ///
+    1140807002 "KOKOMIAN" ///
+    1140807003 "KOUASSI-DATEKRO" ///
+    1140807004 "KOUN-FAO" ///
+    1140807005 "TANKESSE" ///
+    1140807006 "TIENKOIKRO" ///
+    1140808901 "BANDAKAGNI-TOMORA" ///
+    1140808902 "DIMANDOUGOU" ///
+    1140808903 "SANDEGUE" ///
+    1140808904 "YOROBODI" ///
+    1140809301 "ASSUEFRY" ///
+    1140809302 "KOUASSIA-NIAGUINI" ///
+    1140809303 "TRANSUA" ///
+    1142301401 "BOUKO" ///
+    1142301402 "BOUNA" ///
+    1142301403 "ONDEFIDOUO" ///
+    1142301404 "YOUNDOUO" ///
+    1142306301 "BOGOFA" ///
+    1142306302 "KOTOUBA" ///
+    1142306303 "KAKPIN" ///
+    1142306304 "NASSIAN" ///
+    1142306305 "SOMINASSE" ///
+    1142307601 "DANOA" ///
+    1142307602 "DOROPO" ///
+    1142307603 "KALAMON" ///
+    1142307604 "NIAMOUE" ///
+    1142309101 "GOGO" ///
+    1142309102 "TEHINI" ///
+    1142309103 "TOUGBO"
+
 encode B4, gen(department) label(dept)     noextend
-order district region department, after(HHB_debut)
-drop B2 B3 B4
+encode B5, gen(subpref)    label(souspref) noextend
+order district region department subpref, after(HHB_debut)
+drop B2 B3 B4 B5
 
 * 3.2 Timestamps (Survey Solutions "current time") -> Stata %tc
 *     Reads 2026-08-10T09:15:32, 10/08/2026 09:15:32, or an Excel serial number.
@@ -380,7 +541,6 @@ label define A4 1 "Interview completed" 2 "No answer" 3 "Invalid/incorrect numbe
     4 "Line busy" 5 "Callback appointment set" 6 "Respondent refused"          ///
     7 "Respondent hung up / call interrupted" 8 "Other"
 
-label define B5 1 "Urban" 2 "Rural"
 label define C1 1 "Male" 2 "Female"
 label define C3 1 "Single" 2 "Married, monogamous" 3 "Married, polygamous"   ///
     4 "Cohabiting / free union" 5 "Divorced" 6 "Widowed"
@@ -497,7 +657,6 @@ label values consent complete partial final_obs female employed hungup_any yesno
 label values EMPLOYE consentement_capi yesno
 label values A1 A1
 label values A4 A4
-label values B5 B5
 label values C1 C1
 label values C3 C3
 label values C4 C4
@@ -576,7 +735,7 @@ label var A5_heure "A5. Planned time of next attempt"
 label var district   "District (B2 in export)"
 label var region     "Region (B3 in export)"
 label var department "Department (B4 in export)"
-label var B5  "B5. Area of residence"
+label var subpref    "Sub-prefecture / commune (B5 in export)"
 label var B6  "B6. Speaking to the intended respondent"
 label var B6A "B6A. Can speak to the respondent"
 label var B6B "B6B. Agrees to a callback (respondent unavailable)"
@@ -822,12 +981,15 @@ drop _dist _reg
 label var flag_geo "Reported district/region differs from cover"
 
 * Official codes are nested: region 11103 is in district 111,
-* department 11103029 is in region 11103
+* department 11103029 is in region 11103, sub-prefecture 1110302906 is in
+* department 11103029
 gen byte flag_geo_nest = (floor(region / 100) != district) ///
     if !missing(region, district)
 replace flag_geo_nest = 1 if floor(department / 1000) != region ///
     & !missing(department, region)
-label var flag_geo_nest "Region not in district, or department not in region"
+replace flag_geo_nest = 1 if floor(subpref / 100) != department ///
+    & !missing(subpref, department)
+label var flag_geo_nest "Region/department/sub-prefecture not nested in the level above"
 
 gen byte flag_short = (dur_total < 10) if complete == 1 & !missing(dur_total)
 label var flag_short "Completed interview shorter than 10 minutes"
