@@ -1,6 +1,7 @@
 # Stata
 *.dta
 *.log
+!output/*.log
 *.stpr
 *.stbak
 

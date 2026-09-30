@@ -1,0 +1,727 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/02_analysis.log
+  log type:  text
+ opened on:  30 Sep 2026, 16:50:54
+
+. 
+. *------------------------------------------------------------------------------*
+. * 1. Data and sample (common to all analyses)
+. *------------------------------------------------------------------------------*
+. use "$cleandata/coso_baseline_clean.dta", clear
+(COSO baseline phone survey - clean, all call attempts)
+
+. 
+. keep if complete == 1
+(404 observations deleted)
+
+. di as txt "Completed interviews: " as res _N
+Completed interviews: 628
+
+. 
+. * Respondents with more than one completed interview under the same cover_id
+. * (see docs/data_issues.md, issue 1) - used for a sensitivity table only
+. bysort cover_id: egen n_complete = total(complete)
+
+. gen byte dup_id = (n_complete > 1)
+
+. label var dup_id "cover_id has more than one completed interview"
+
+. 
+. * Accepted by supervisor (status Completed) vs rejected / still assigned
+. gen byte status_ok = (interview__status == "Completed")
+
+. label var status_ok "Interview status: Completed (not rejected)"
+
+. label values dup_id status_ok yesno
+
+. 
+. * Column variable for one-way tables
+. gen byte total = 1
+
+. label define total 1 "Total"
+
+. label values total total
+
+. label var total "Total"
+
+. 
+. *==============================================================================*
+. * 2. ANALYSIS 1 - TRACK SIZE
+. *==============================================================================*
+. 
+. *------------------------------------------------------------------------------*
+. * 2.1 Track criteria
+. *------------------------------------------------------------------------------*
+. * Inputs: spot check
+. tab K1, missing
+
+    K1. Has ever started own |
+  income-generating activity |      Freq.     Percent        Cum.
+-----------------------------+-----------------------------------
+                          No |        302       48.09       48.09
+                         Yes |        326       51.91      100.00
+-----------------------------+-----------------------------------
+                       Total |        628      100.00
+
+. tab K2 if K1 == 0, missing
+
+ K2. Would like to start own |
+      activity in the future |      Freq.     Percent        Cum.
+-----------------------------+-----------------------------------
+                          No |         28        9.27        9.27
+                         Yes |        274       90.73      100.00
+-----------------------------+-----------------------------------
+                       Total |        302      100.00
+
+. tab F1 if K1 == 1, missing
+
+           F1. Status in main job |      Freq.     Percent        Cum.
+----------------------------------+-----------------------------------
+                         Employee |          6        1.84        1.84
+        Employer (with employees) |         14        4.29        6.13
+Own-account worker (no employees) |        263       80.67       86.81
+ Member of producers' cooperative |          3        0.92       87.73
+       Contributing family worker |         19        5.83       93.56
+              Apprentice / intern |          1        0.31       93.87
+                            Other |          3        0.92       94.79
+                                . |         17        5.21      100.00
+----------------------------------+-----------------------------------
+                            Total |        326      100.00
+
+. tab employed, missing
+
+        Employed last 7 days |
+      (E1/E2/E3, recomputed) |      Freq.     Percent        Cum.
+-----------------------------+-----------------------------------
+                          No |         66       10.51       10.51
+                         Yes |        562       89.49      100.00
+-----------------------------+-----------------------------------
+                       Total |        628      100.00
+
+. tab P4 if employed == 0, missing
+
+        P4. Sector of greatest interest |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+Agriculture, livestock, fishing, forest |          9       13.64       13.64
+                           Construction |          8       12.12       25.76
+               Wholesale / retail trade |         34       51.52       77.27
+        Accommodation and food services |          1        1.52       78.79
+                  Public administration |          1        1.52       80.30
+Other services (repair, personal, arts) |         11       16.67       96.97
+                                  Other |          2        3.03      100.00
+----------------------------------------+-----------------------------------
+                                  Total |         66      100.00
+
+. 
+. * Track A: never started an activity and wants to start one
+. gen byte crit_A = (K1 == 0 & K2 == 1)
+
+. label var crit_A "Meets Track A criteria (K1 = No, K2 = Yes)"
+
+. 
+. * Track B: has started an activity and is employer / own-account / cooperative
+. gen byte crit_B = (K1 == 1 & inlist(F1, 2, 3, 4))
+
+. label var crit_B "Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)"
+
+. 
+. * Track C: not employed and aspires to a skilled-trade sector
+. *   P4: 3 Manufacturing, 4 Construction, 6 Transport, 7 Accommodation/food,
+. *       8 ICT/digital, 14 Other services (repair, personal, arts)
+. gen byte crit_C = (employed == 0 & inlist(P4, 3, 4, 6, 7, 8, 14))
+
+. label var crit_C "Meets Track C criteria (not employed, aspires to a skilled trade)"
+
+. 
+. label values crit_A crit_B crit_C yesno
+
+. 
+. * Check: B never overlaps with A or C (should both be 0)
+. count if crit_B == 1 & crit_A == 1
+  0
+
+. count if crit_B == 1 & crit_C == 1
+  0
+
+. 
+. *------------------------------------------------------------------------------*
+. * 2.2 Provisional track
+. *------------------------------------------------------------------------------*
+. gen byte track = 5
+
+. replace track = 1 if crit_A == 1 & crit_C == 0
+(258 real changes made)
+
+. replace track = 2 if crit_B == 1
+(280 real changes made)
+
+. replace track = 3 if crit_C == 1 & crit_A == 0
+(4 real changes made)
+
+. replace track = 4 if crit_A == 1 & crit_C == 1
+(16 real changes made)
+
+. 
+. label define track 1 "Track A - Start-up"                    ///
+>                    2 "Track B - Existing enterprise growth"  ///
+>                    3 "Track C - Apprenticeship to work"      ///
+>                    4 "Tracks A and C (both apply)"           ///
+>                    5 "Undetermined"
+
+. label values track track
+
+. label var track "Provisional programme track"
+
+. 
+. * Reason for undetermined
+. *   1 Employed, but not employer/own-account/coop with an own activity
+. *     (wage worker, family worker, apprentice, or never started an activity
+. *     and not wanting to)
+. *   2 Not employed, started an activity before (no longer running it)
+. *   3 Not employed, never started, no wish to start, aspired sector is not
+. *     a skilled trade
+. *   4 Missing information (K1, employment or P4)
+. gen byte undet_reason = .
+(628 missing values generated)
+
+. replace undet_reason = 4 if track == 5 & (missing(K1) | missing(employed))
+(0 real changes made)
+
+. replace undet_reason = 1 if track == 5 & missing(undet_reason) & employed == 1
+(53 real changes made)
+
+. replace undet_reason = 2 if track == 5 & missing(undet_reason) & employed == 0 & K1 == 1
+(14 real changes made)
+
+. replace undet_reason = 3 if track == 5 & missing(undet_reason) & employed == 0 & K1 == 0
+(3 real changes made)
+
+. replace undet_reason = 4 if track == 5 & missing(undet_reason)
+(0 real changes made)
+
+. 
+. label define undet_reason                                                    ///
+>     1 "Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)" ///
+>     2 "Not employed, had an activity before (closed)"                         ///
+>     3 "Not employed, no wish to start, aspiration not a skilled trade"        ///
+>     4 "Missing information"
+
+. label values undet_reason undet_reason
+
+. label var undet_reason "Reason track is undetermined"
+
+. 
+. * Spot checks
+. tab track, missing
+
+         Provisional programme track |      Freq.     Percent        Cum.
+-------------------------------------+-----------------------------------
+                  Track A - Start-up |        258       41.08       41.08
+Track B - Existing enterprise growth |        280       44.59       85.67
+    Track C - Apprenticeship to work |          4        0.64       86.31
+         Tracks A and C (both apply) |         16        2.55       88.85
+                        Undetermined |         70       11.15      100.00
+-------------------------------------+-----------------------------------
+                               Total |        628      100.00
+
+. tab undet_reason if track == 5, missing
+
+           Reason track is undetermined |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+Employed, no own enterprise (wage/famil |         53       75.71       75.71
+Not employed, had an activity before (c |         14       20.00       95.71
+Not employed, no wish to start, aspirat |          3        4.29      100.00
+----------------------------------------+-----------------------------------
+                                  Total |         70      100.00
+
+. tab track employed, missing
+
+                      | Employed last 7 days
+                      |      (E1/E2/E3,
+Provisional programme |      recomputed)
+                track |        No        Yes |     Total
+----------------------+----------------------+----------
+   Track A - Start-up |        29        229 |       258 
+Track B - Existing en |         0        280 |       280 
+Track C - Apprentices |         4          0 |         4 
+Tracks A and C (both  |        16          0 |        16 
+         Undetermined |        17         53 |        70 
+----------------------+----------------------+----------
+                Total |        66        562 |       628 
+
+. tab track K1, missing
+
+                      | K1. Has ever started
+                      | own income-generating
+Provisional programme |       activity
+                track |        No        Yes |     Total
+----------------------+----------------------+----------
+   Track A - Start-up |       258          0 |       258 
+Track B - Existing en |         0        280 |       280 
+Track C - Apprentices |         1          3 |         4 
+Tracks A and C (both  |        16          0 |        16 
+         Undetermined |        27         43 |        70 
+----------------------+----------------------+----------
+                Total |       302        326 |       628 
+
+. 
+. *------------------------------------------------------------------------------*
+. * 2.3 Tables
+. *------------------------------------------------------------------------------*
+. 
+. * 2.3.1 Track size
+. tabout track total using "$out/Results.xls", ///
+>     replace c(freq col) format(0c 1p) layout(cb) style(xls) ///
+>     h1("Analysis 1 - Provisional programme track - completed interviews")
+
+Table output written to: C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/Results.xls
+
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      258     258     41.1%   41.1%
+Track B - Existing enterprise growth    280     280     44.6%   44.6%
+Track C - Apprenticeship to work        4       4       0.6%    0.6%
+Tracks A and C (both apply)     16      16      2.5%    2.5%
+Undetermined    70      70      11.1%   11.1%
+Total   628     628     100.0%  100.0%
+
+. 
+. * 2.3.2 Criteria met (tracks A and C can overlap)
+. tabout crit_A total using "$out/Results.xls", ///
+>     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+>     h1("Analysis 1 - Meets Track A criteria: never started an activity and wants to start one")
+
+Table output written to: C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/Results.xls
+
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      258     258     41.1%   41.1%
+Track B - Existing enterprise growth    280     280     44.6%   44.6%
+Track C - Apprenticeship to work        4       4       0.6%    0.6%
+Tracks A and C (both apply)     16      16      2.5%    2.5%
+Undetermined    70      70      11.1%   11.1%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)      Total   Total   Total   Total
+        No.     No.     %       %
+No      354     354     56.4%   56.4%
+Yes     274     274     43.6%   43.6%
+Total   628     628     100.0%  100.0%
+
+. 
+. tabout crit_B total using "$out/Results.xls", ///
+>     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+>     h1("Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative")
+
+Table output written to: C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/Results.xls
+
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      258     258     41.1%   41.1%
+Track B - Existing enterprise growth    280     280     44.6%   44.6%
+Track C - Apprenticeship to work        4       4       0.6%    0.6%
+Tracks A and C (both apply)     16      16      2.5%    2.5%
+Undetermined    70      70      11.1%   11.1%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)      Total   Total   Total   Total
+        No.     No.     %       %
+No      354     354     56.4%   56.4%
+Yes     274     274     43.6%   43.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative
+Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)       Total   Total   Total   Total
+        No.     No.     %       %
+No      348     348     55.4%   55.4%
+Yes     280     280     44.6%   44.6%
+Total   628     628     100.0%  100.0%
+
+. 
+. tabout crit_C total using "$out/Results.xls", ///
+>     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+>     h1("Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade")
+
+Table output written to: C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/Results.xls
+
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      258     258     41.1%   41.1%
+Track B - Existing enterprise growth    280     280     44.6%   44.6%
+Track C - Apprenticeship to work        4       4       0.6%    0.6%
+Tracks A and C (both apply)     16      16      2.5%    2.5%
+Undetermined    70      70      11.1%   11.1%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)      Total   Total   Total   Total
+        No.     No.     %       %
+No      354     354     56.4%   56.4%
+Yes     274     274     43.6%   43.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative
+Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)       Total   Total   Total   Total
+        No.     No.     %       %
+No      348     348     55.4%   55.4%
+Yes     280     280     44.6%   44.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade
+Meets Track C criteria (not employed, aspires to a skilled trade)       Total   Total   Total   Total
+        No.     No.     %       %
+No      608     608     96.8%   96.8%
+Yes     20      20      3.2%    3.2%
+Total   628     628     100.0%  100.0%
+
+. 
+. * 2.3.3 Why undetermined
+. tabout undet_reason total if track == 5 using "$out/Results.xls", ///
+>     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+>     h1("Analysis 1 - Undetermined track - reason")
+
+Table output written to: C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/Results.xls
+
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      258     258     41.1%   41.1%
+Track B - Existing enterprise growth    280     280     44.6%   44.6%
+Track C - Apprenticeship to work        4       4       0.6%    0.6%
+Tracks A and C (both apply)     16      16      2.5%    2.5%
+Undetermined    70      70      11.1%   11.1%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)      Total   Total   Total   Total
+        No.     No.     %       %
+No      354     354     56.4%   56.4%
+Yes     274     274     43.6%   43.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative
+Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)       Total   Total   Total   Total
+        No.     No.     %       %
+No      348     348     55.4%   55.4%
+Yes     280     280     44.6%   44.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade
+Meets Track C criteria (not employed, aspires to a skilled trade)       Total   Total   Total   Total
+        No.     No.     %       %
+No      608     608     96.8%   96.8%
+Yes     20      20      3.2%    3.2%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Undetermined track - reason
+Reason track is undetermined    Total   Total   Total   Total
+        No.     No.     %       %
+Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)       53      53      75.7%   75.7%
+Not employed, had an activity before (closed)   14      14      20.0%   20.0%
+Not employed, no wish to start, aspiration not a skilled trade  3       3       4.3%    4.3%
+Total   70      70      100.0%  100.0%
+
+. 
+. * 2.3.4 Track by sex and by district
+. tabout track C1 using "$out/Results.xls", ///
+>     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+>     h1("Analysis 1 - Provisional track by sex")
+
+Table output written to: C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/Results.xls
+
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      258     258     41.1%   41.1%
+Track B - Existing enterprise growth    280     280     44.6%   44.6%
+Track C - Apprenticeship to work        4       4       0.6%    0.6%
+Tracks A and C (both apply)     16      16      2.5%    2.5%
+Undetermined    70      70      11.1%   11.1%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)      Total   Total   Total   Total
+        No.     No.     %       %
+No      354     354     56.4%   56.4%
+Yes     274     274     43.6%   43.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative
+Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)       Total   Total   Total   Total
+        No.     No.     %       %
+No      348     348     55.4%   55.4%
+Yes     280     280     44.6%   44.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade
+Meets Track C criteria (not employed, aspires to a skilled trade)       Total   Total   Total   Total
+        No.     No.     %       %
+No      608     608     96.8%   96.8%
+Yes     20      20      3.2%    3.2%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Undetermined track - reason
+Reason track is undetermined    Total   Total   Total   Total
+        No.     No.     %       %
+Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)       53      53      75.7%   75.7%
+Not employed, had an activity before (closed)   14      14      20.0%   20.0%
+Not employed, no wish to start, aspiration not a skilled trade  3       3       4.3%    4.3%
+Total   70      70      100.0%  100.0%
+
+Analysis 1 - Provisional track by sex
+Provisional programme track     Male    Female  Total   Male    Female  Total
+        No.     No.     No.     %       %       %
+Track A - Start-up      183     75      258     43.6%   36.1%   41.1%
+Track B - Existing enterprise growth    166     114     280     39.5%   54.8%   44.6%
+Track C - Apprenticeship to work        4       0       4       1.0%    0.0%    0.6%
+Tracks A and C (both apply)     8       8       16      1.9%    3.8%    2.5%
+Undetermined    59      11      70      14.0%   5.3%    11.1%
+Total   420     208     628     100.0%  100.0%  100.0%
+
+. 
+. tabout track B1 using "$out/Results.xls", ///
+>     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+>     h1("Analysis 1 - Provisional track by district")
+
+Table output written to: C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/Results.xls
+
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      258     258     41.1%   41.1%
+Track B - Existing enterprise growth    280     280     44.6%   44.6%
+Track C - Apprenticeship to work        4       4       0.6%    0.6%
+Tracks A and C (both apply)     16      16      2.5%    2.5%
+Undetermined    70      70      11.1%   11.1%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)      Total   Total   Total   Total
+        No.     No.     %       %
+No      354     354     56.4%   56.4%
+Yes     274     274     43.6%   43.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative
+Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)       Total   Total   Total   Total
+        No.     No.     %       %
+No      348     348     55.4%   55.4%
+Yes     280     280     44.6%   44.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade
+Meets Track C criteria (not employed, aspires to a skilled trade)       Total   Total   Total   Total
+        No.     No.     %       %
+No      608     608     96.8%   96.8%
+Yes     20      20      3.2%    3.2%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Undetermined track - reason
+Reason track is undetermined    Total   Total   Total   Total
+        No.     No.     %       %
+Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)       53      53      75.7%   75.7%
+Not employed, had an activity before (closed)   14      14      20.0%   20.0%
+Not employed, no wish to start, aspiration not a skilled trade  3       3       4.3%    4.3%
+Total   70      70      100.0%  100.0%
+
+Analysis 1 - Provisional track by sex
+Provisional programme track     Male    Female  Total   Male    Female  Total
+        No.     No.     No.     %       %       %
+Track A - Start-up      183     75      258     43.6%   36.1%   41.1%
+Track B - Existing enterprise growth    166     114     280     39.5%   54.8%   44.6%
+Track C - Apprenticeship to work        4       0       4       1.0%    0.0%    0.6%
+Tracks A and C (both apply)     8       8       16      1.9%    3.8%    2.5%
+Undetermined    59      11      70      14.0%   5.3%    11.1%
+Total   420     208     628     100.0%  100.0%  100.0%
+
+Analysis 1 - Provisional track by district
+Provisional programme track     DENGUELE        SAVANES WOROBA  ZANZAN  Total   DENGUELE        SAVANES WOROBA  ZANZAN  Total
+        No.     No.     No.     No.     No.     %       %       %       %       %
+Track A - Start-up      30      123     34      71      258     44.8%   46.8%   31.5%   37.4%   41.1%
+Track B - Existing enterprise growth    27      96      58      99      280     40.3%   36.5%   53.7%   52.1%   44.6%
+Track C - Apprenticeship to work        1       2       0       1       4       1.5%    0.8%    0.0%    0.5%    0.6%
+Tracks A and C (both apply)     2       5       1       8       16      3.0%    1.9%    0.9%    4.2%    2.5%
+Undetermined    7       37      15      11      70      10.4%   14.1%   13.9%   5.8%    11.1%
+Total   67      263     108     190     628     100.0%  100.0%  100.0%  100.0%  100.0%
+
+. 
+. * 2.3.5 Sensitivity: interview status and duplicate IDs
+. tabout track status_ok using "$out/Results.xls", ///
+>     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+>     h1("Analysis 1 - Provisional track by interview status (Yes = Completed, No = rejected/assigned)")
+
+Table output written to: C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/Results.xls
+
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      258     258     41.1%   41.1%
+Track B - Existing enterprise growth    280     280     44.6%   44.6%
+Track C - Apprenticeship to work        4       4       0.6%    0.6%
+Tracks A and C (both apply)     16      16      2.5%    2.5%
+Undetermined    70      70      11.1%   11.1%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)      Total   Total   Total   Total
+        No.     No.     %       %
+No      354     354     56.4%   56.4%
+Yes     274     274     43.6%   43.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative
+Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)       Total   Total   Total   Total
+        No.     No.     %       %
+No      348     348     55.4%   55.4%
+Yes     280     280     44.6%   44.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade
+Meets Track C criteria (not employed, aspires to a skilled trade)       Total   Total   Total   Total
+        No.     No.     %       %
+No      608     608     96.8%   96.8%
+Yes     20      20      3.2%    3.2%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Undetermined track - reason
+Reason track is undetermined    Total   Total   Total   Total
+        No.     No.     %       %
+Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)       53      53      75.7%   75.7%
+Not employed, had an activity before (closed)   14      14      20.0%   20.0%
+Not employed, no wish to start, aspiration not a skilled trade  3       3       4.3%    4.3%
+Total   70      70      100.0%  100.0%
+
+Analysis 1 - Provisional track by sex
+Provisional programme track     Male    Female  Total   Male    Female  Total
+        No.     No.     No.     %       %       %
+Track A - Start-up      183     75      258     43.6%   36.1%   41.1%
+Track B - Existing enterprise growth    166     114     280     39.5%   54.8%   44.6%
+Track C - Apprenticeship to work        4       0       4       1.0%    0.0%    0.6%
+Tracks A and C (both apply)     8       8       16      1.9%    3.8%    2.5%
+Undetermined    59      11      70      14.0%   5.3%    11.1%
+Total   420     208     628     100.0%  100.0%  100.0%
+
+Analysis 1 - Provisional track by district
+Provisional programme track     DENGUELE        SAVANES WOROBA  ZANZAN  Total   DENGUELE        SAVANES WOROBA  ZANZAN  Total
+        No.     No.     No.     No.     No.     %       %       %       %       %
+Track A - Start-up      30      123     34      71      258     44.8%   46.8%   31.5%   37.4%   41.1%
+Track B - Existing enterprise growth    27      96      58      99      280     40.3%   36.5%   53.7%   52.1%   44.6%
+Track C - Apprenticeship to work        1       2       0       1       4       1.5%    0.8%    0.0%    0.5%    0.6%
+Tracks A and C (both apply)     2       5       1       8       16      3.0%    1.9%    0.9%    4.2%    2.5%
+Undetermined    7       37      15      11      70      10.4%   14.1%   13.9%   5.8%    11.1%
+Total   67      263     108     190     628     100.0%  100.0%  100.0%  100.0%  100.0%
+
+Analysis 1 - Provisional track by interview status (Yes = Completed, No = rejected/assigned)
+Provisional programme track     No      Yes     Total   No      Yes     Total
+        No.     No.     No.     %       %       %
+Track A - Start-up      76      182     258     35.5%   44.0%   41.1%
+Track B - Existing enterprise growth    104     176     280     48.6%   42.5%   44.6%
+Track C - Apprenticeship to work        2       2       4       0.9%    0.5%    0.6%
+Tracks A and C (both apply)     8       8       16      3.7%    1.9%    2.5%
+Undetermined    24      46      70      11.2%   11.1%   11.1%
+Total   214     414     628     100.0%  100.0%  100.0%
+
+. 
+. tabout track total if dup_id == 0 using "$out/Results.xls", ///
+>     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+>     h1("Analysis 1 - Provisional track - excluding cover_ids with more than one completed interview")
+
+Table output written to: C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/Results.xls
+
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      258     258     41.1%   41.1%
+Track B - Existing enterprise growth    280     280     44.6%   44.6%
+Track C - Apprenticeship to work        4       4       0.6%    0.6%
+Tracks A and C (both apply)     16      16      2.5%    2.5%
+Undetermined    70      70      11.1%   11.1%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)      Total   Total   Total   Total
+        No.     No.     %       %
+No      354     354     56.4%   56.4%
+Yes     274     274     43.6%   43.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative
+Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)       Total   Total   Total   Total
+        No.     No.     %       %
+No      348     348     55.4%   55.4%
+Yes     280     280     44.6%   44.6%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade
+Meets Track C criteria (not employed, aspires to a skilled trade)       Total   Total   Total   Total
+        No.     No.     %       %
+No      608     608     96.8%   96.8%
+Yes     20      20      3.2%    3.2%
+Total   628     628     100.0%  100.0%
+
+Analysis 1 - Undetermined track - reason
+Reason track is undetermined    Total   Total   Total   Total
+        No.     No.     %       %
+Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)       53      53      75.7%   75.7%
+Not employed, had an activity before (closed)   14      14      20.0%   20.0%
+Not employed, no wish to start, aspiration not a skilled trade  3       3       4.3%    4.3%
+Total   70      70      100.0%  100.0%
+
+Analysis 1 - Provisional track by sex
+Provisional programme track     Male    Female  Total   Male    Female  Total
+        No.     No.     No.     %       %       %
+Track A - Start-up      183     75      258     43.6%   36.1%   41.1%
+Track B - Existing enterprise growth    166     114     280     39.5%   54.8%   44.6%
+Track C - Apprenticeship to work        4       0       4       1.0%    0.0%    0.6%
+Tracks A and C (both apply)     8       8       16      1.9%    3.8%    2.5%
+Undetermined    59      11      70      14.0%   5.3%    11.1%
+Total   420     208     628     100.0%  100.0%  100.0%
+
+Analysis 1 - Provisional track by district
+Provisional programme track     DENGUELE        SAVANES WOROBA  ZANZAN  Total   DENGUELE        SAVANES WOROBA  ZANZAN  Total
+        No.     No.     No.     No.     No.     %       %       %       %       %
+Track A - Start-up      30      123     34      71      258     44.8%   46.8%   31.5%   37.4%   41.1%
+Track B - Existing enterprise growth    27      96      58      99      280     40.3%   36.5%   53.7%   52.1%   44.6%
+Track C - Apprenticeship to work        1       2       0       1       4       1.5%    0.8%    0.0%    0.5%    0.6%
+Tracks A and C (both apply)     2       5       1       8       16      3.0%    1.9%    0.9%    4.2%    2.5%
+Undetermined    7       37      15      11      70      10.4%   14.1%   13.9%   5.8%    11.1%
+Total   67      263     108     190     628     100.0%  100.0%  100.0%  100.0%  100.0%
+
+Analysis 1 - Provisional track by interview status (Yes = Completed, No = rejected/assigned)
+Provisional programme track     No      Yes     Total   No      Yes     Total
+        No.     No.     No.     %       %       %
+Track A - Start-up      76      182     258     35.5%   44.0%   41.1%
+Track B - Existing enterprise growth    104     176     280     48.6%   42.5%   44.6%
+Track C - Apprenticeship to work        2       2       4       0.9%    0.5%    0.6%
+Tracks A and C (both apply)     8       8       16      3.7%    1.9%    2.5%
+Undetermined    24      46      70      11.2%   11.1%   11.1%
+Total   214     414     628     100.0%  100.0%  100.0%
+
+Analysis 1 - Provisional track - excluding cover_ids with more than one completed interview
+Provisional programme track     Total   Total   Total   Total
+        No.     No.     %       %
+Track A - Start-up      243     243     40.9%   40.9%
+Track B - Existing enterprise growth    269     269     45.3%   45.3%
+Track C - Apprenticeship to work        4       4       0.7%    0.7%
+Tracks A and C (both apply)     14      14      2.4%    2.4%
+Undetermined    64      64      10.8%   10.8%
+Total   594     594     100.0%  100.0%
+
+. 
+. *==============================================================================*
+. * 3. ANALYSIS 2 - (next analysis goes here; tables use -append-)
+. *==============================================================================*
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\WB461621\OneDrive - WBG\SPJ\Cote dIvoire\ImpactEval\Output/02_analysis.log
+  log type:  text
+ closed on:  30 Sep 2026, 16:50:54
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
