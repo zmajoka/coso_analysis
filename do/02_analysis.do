@@ -242,7 +242,7 @@ preserve
 
     bysort B2: egen n_region = total(n)
     gen share = 100 * n / n_region
-    egen rank = rank(-n), by(B2) field          // 1 = most common; ties share a rank
+    egen rank = rank(n), by(B2) field           // 1 = most common; ties share a rank
     gen byte saturation = (share > 30)
 
     label var n          "Applicants aspiring to the sector"
@@ -292,7 +292,7 @@ preserve
 
     bysort B2: egen n_region = total(n)
     gen share = 100 * n / n_region
-    egen rank = rank(-n), by(B2) field
+    egen rank = rank(n), by(B2) field
     gen byte saturation = (share > 30)
 
     label var n          "Employed applicants in the sector"
