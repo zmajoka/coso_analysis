@@ -208,21 +208,10 @@ tabout track if dup_id == 0 using "$out/Results.xls", ///
 * A region x sector cell where more than 30% of the region's applicants share
 * the same sector is flagged as a saturation risk zone.
 * Note: P4/F2 are broad sectors ("Other services" groups tailors, mechanics,
-* hairdressers...). Regions are small (see 3.1): read shares with the counts.
+* hairdressers...). Regions are small: read shares with the counts (3.1, 3.3).
 
 *------------------------------------------------------------------------------*
-* 3.1 Sample by region and urban/rural
-*------------------------------------------------------------------------------*
-tabout B2 using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 2 - Completed interviews by region")
-
-tabout B2 B5 using "$out/Results.xls", ///
-    append c(freq row) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 2 - Completed interviews by region and urban/rural")
-
-*------------------------------------------------------------------------------*
-* 3.2 Aspired sector (P4) by region and by urban/rural
+* 3.1 Aspired sector (P4) by region and by urban/rural
 *------------------------------------------------------------------------------*
 tabout P4 B2 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
@@ -233,7 +222,7 @@ tabout P4 B5 using "$out/Results.xls", ///
     h1("Analysis 2 - Aspired sector (P4) by urban/rural")
 
 *------------------------------------------------------------------------------*
-* 3.3 Aspired sector: top 3 per region and saturation risk (> 30%)
+* 3.2 Aspired sector: top 3 per region and saturation risk (> 30%)
 *------------------------------------------------------------------------------*
 preserve
     keep if !missing(P4, B2)
@@ -272,7 +261,7 @@ preserve
 restore
 
 *------------------------------------------------------------------------------*
-* 3.4 Current sector (F2, employed) by region and by urban/rural
+* 3.3 Current sector (F2, employed) by region and by urban/rural
 *------------------------------------------------------------------------------*
 tabout F2 B2 if employed == 1 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
@@ -283,7 +272,7 @@ tabout F2 B5 if employed == 1 using "$out/Results.xls", ///
     h1("Analysis 2 - Current sector (F2) by urban/rural, employed applicants")
 
 *------------------------------------------------------------------------------*
-* 3.5 Current sector: top 3 per region and saturation risk (> 30%)
+* 3.4 Current sector: top 3 per region and saturation risk (> 30%)
 *------------------------------------------------------------------------------*
 preserve
     keep if employed == 1 & !missing(F2, B2)
@@ -320,13 +309,6 @@ preserve
             h1("Analysis 2 - SATURATION RISK: current sector of more than 30% of the region's employed applicants (%)")
     }
 restore
-
-*------------------------------------------------------------------------------*
-* 3.6 Aspired vs current sector (employed): moving into or staying in a sector
-*------------------------------------------------------------------------------*
-tabout F2 P4 if employed == 1 using "$out/Results.xls", ///
-    append c(freq row) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 2 - Current sector (rows) by aspired sector (columns), employed applicants: row %")
 
 *==============================================================================*
 * 4. ANALYSIS 3 - (next analysis goes here; tables use -append-)
