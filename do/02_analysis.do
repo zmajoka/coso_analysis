@@ -16,6 +16,7 @@
     1. Data and sample (common to all analyses)
     2. Analysis 1 - Track size (provisional track assignment)
     3. Analysis 2 - Sector concentration by geography (saturation risk)
+    4. Analysis 3 - Skills baseline by track
 
   ------------------------------------------------------------------------------
   Analysis 1 - Track size
@@ -311,7 +312,63 @@ preserve
 restore
 
 *==============================================================================*
-* 4. ANALYSIS 3 - (next analysis goes here; tables use -append-)
+* 4. ANALYSIS 3 - SKILLS BASELINE BY TRACK
+*==============================================================================*
+* Uses the provisional track from Analysis 1 (section 2).
+*   K7     : self-rated business management skills
+*   O3     : vocational/technical training or apprenticeship, last 12 months
+*   O4     : field of that training (free text)
+*   O5, O6 : training provider, usefulness
+*   P4     : aspired sector
+*   J2     : time without work and searching (asked only if J0 = searching)
+
+*------------------------------------------------------------------------------*
+* 4.1 Self-rated business skills (K7) by provisional track
+*------------------------------------------------------------------------------*
+tabout K7 track using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 3 - Self-rated business management skills (K7) by provisional track")
+
+*------------------------------------------------------------------------------*
+* 4.2 Prior training (O module) by aspired sector (P4)
+*------------------------------------------------------------------------------*
+tabout O3 P4 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 3 - Vocational/technical training in the last 12 months (O3) by aspired sector")
+
+tabout O5 P4 if O3 == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 3 - Training provider (O5) by aspired sector, trained applicants")
+
+tabout O6 P4 if O3 == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 3 - Usefulness of the training (O6) by aspired sector, trained applicants")
+
+* Field of training (O4, free text) next to the aspired sector: for checking
+* whether training and aspiration align (O4 still to be coded into sectors)
+preserve
+    keep if O3 == 1
+    sort P4 O4
+    list P4 O4, sepby(P4) noobs
+restore
+
+*------------------------------------------------------------------------------*
+* 4.3 Track C: unemployment duration (J2) by prior training and aspired sector
+*------------------------------------------------------------------------------*
+* Track C criteria met (crit_C: Track C alone or Tracks A and C).
+* J2 is blank for those not searching for work (J0 = No).
+tab J2 if crit_C == 1, missing
+
+tabout J2 O3 if crit_C == 1 using "$out/Results.xls", ///
+    append mi c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 3 - Track C: time without work and searching (J2) by training in the last 12 months (O3); Missing = not searching")
+
+tabout J2 P4 if crit_C == 1 using "$out/Results.xls", ///
+    append mi c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 3 - Track C: time without work and searching (J2) by aspired sector (P4); Missing = not searching")
+
+*==============================================================================*
+* 5. ANALYSIS 4 - (next analysis goes here; tables use -append-)
 *==============================================================================*
 
 log close

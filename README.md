@@ -6,7 +6,7 @@ Baseline survey data analysis and do files.
 | File | What it does |
 |------|--------------|
 | `do/01_import_clean.do` | Imports `data_exploration.xlsx`, cleans and labels it following `docs/Original Questionnaire_COSO_V5.pdf`, saves the clean dataset |
-| `do/02_analysis.do` | All analysis, one numbered section per analysis. All tables go to `$out/Results.xls` (`tabout`, first table `replace`, the rest `append`). Section 2: Analysis 1, provisional programme track and track sizes. Section 3: Analysis 2, sector concentration by region and urban/rural (saturation risk) |
+| `do/02_analysis.do` | All analysis, one numbered section per analysis. All tables go to `$out/Results.xls` (`tabout`, first table `replace`, the rest `append`). Section 2: Analysis 1, provisional programme track and track sizes. Section 3: Analysis 2, sector concentration by region and urban/rural (saturation risk). Section 4: Analysis 3, skills baseline by track |
 
 Data problems found during cleaning, and questions for the survey firm, are in `docs/data_issues.md`.
 
