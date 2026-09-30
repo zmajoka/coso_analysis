@@ -18,6 +18,8 @@ analysis.
 - This is based on the survey content, not on the Survey Solutions status. Of the
   628, 414 are "Completed", 209 "RejectedBySupervisor" and 5
   "InterviewerAssigned".
+- Including the 209 "RejectedBySupervisor" interviews is **provisional**, until
+  the firm explains why they were rejected (see question 1 below).
 - The 17 `cover_id`s in issue 1 below have more than one completed interview and
   are not resolved yet.
 
@@ -112,17 +114,25 @@ new interview was opened instead of correcting the rejected one (see issue 1).
 
 ## B. Questions for the firm
 
-1. For each `cover_id` in issue 1: who was actually interviewed in each
+1. **"RejectedBySupervisor" interviews.** 365 interviews have this status, 209
+   of them fully completed (consent given, reached section R). Please clarify:
+   - Why were they rejected (data quality, wrong respondent, incomplete, other)?
+     Can you give the reason for each interview?
+   - Is the data in a rejected interview usable as it stands, or should it be
+     treated as invalid until corrected?
+   - Will rejected interviews be corrected and resubmitted (same
+     `interview__key`), or redone as new interviews? When both exist for the
+     same respondent, which one should we use?
+   - Will the final export contain only approved interviews?
+2. For each `cover_id` in issue 1: who was actually interviewed in each
    interview? Can this be checked against the call recordings?
-2. Can you send the sample/preload file (`cover_id`, name, phone number,
+3. Can you send the sample/preload file (`cover_id`, name, phone number,
    locality) loaded into the tablets, so interviews can be matched to applicants?
-3. Is `localite` on the cover page preloaded, or typed by the interviewer? Is B7
+4. Is `localite` on the cover page preloaded, or typed by the interviewer? Is B7
    typed from what the respondent says, or copied from the preloaded name?
-4. Can you add `nom_agent` and `nom_sup` to the export?
-5. Can you export in Survey Solutions Stata format (codes and labels), or fix
+5. Can you add `nom_agent` and `nom_sup` to the export?
+6. Can you export in Survey Solutions Stata format (codes and labels), or fix
    the Excel header row?
-6. Are rejected interviews being corrected (same interview) or redone as new
-   interviews? Which one should we use when both exist?
 7. Why were some interviews open for more than 20 hours, and some completed in
    under 10 minutes?
 8. How are you planning the call-backs, and how will you report response rates
