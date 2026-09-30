@@ -75,6 +75,12 @@ gen byte status_ok = (interview__status == "Completed")
 label var status_ok "Interview status: Completed (not rejected)"
 label values dup_id status_ok yesno
 
+* Column variable for tables of a single variable (so that h1() shows)
+gen byte total = 1
+label define total 1 "All"
+label values total total
+label var total "All"
+
 *==============================================================================*
 * 2. ANALYSIS 1 - TRACK SIZE
 *==============================================================================*
@@ -160,27 +166,27 @@ tab track K1, missing
 *------------------------------------------------------------------------------*
 
 * 2.3.1 Track size
-tabout track using "$out/Results.xls", ///
-    replace oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 1 - Provisional programme track - completed interviews")
+tabout track total using "$out/Results.xls", ///
+    replace c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 1 - Provisional programme track - completed interviews")
 
 * 2.3.2 Criteria met (tracks A and C can overlap)
-tabout crit_A using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 1 - Meets Track A criteria: never started an activity and wants to start one")
+tabout crit_A total using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 1 - Meets Track A criteria: never started an activity and wants to start one")
 
-tabout crit_B using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative")
+tabout crit_B total using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative")
 
-tabout crit_C using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade")
+tabout crit_C total using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade")
 
 * 2.3.3 Why undetermined
-tabout undet_reason if track == 5 using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 1 - Undetermined track - reason")
+tabout undet_reason total if track == 5 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 1 - Undetermined track - reason")
 
 * 2.3.4 Track by sex and by district
 tabout track C1 using "$out/Results.xls", ///
@@ -196,9 +202,9 @@ tabout track status_ok using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Provisional track by interview status (Yes = Completed, No = rejected/assigned)")
 
-tabout track if dup_id == 0 using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 1 - Provisional track - excluding cover_ids with more than one completed interview")
+tabout track total if dup_id == 0 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 1 - Provisional track - excluding cover_ids with more than one completed interview")
 
 *==============================================================================*
 * 3. ANALYSIS 2 - SECTOR CONCENTRATION BY GEOGRAPHY
@@ -401,9 +407,21 @@ tabout L3 P4_sector if crit_A == 1 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 4 - Track A: saves money regularly (L3), by aspired sector")
 
-tabout P4_sector if crit_A == 1 using "$out/Results.xls", ///
-    append sum oneway c(N L4 p25 L4 median L4 p75 L4) format(0c 0c 0c 0c) style(xls) ///
-    title("Analysis 4 - Track A: amount saved in a typical month (L4, FCFA), savers, by aspired sector")
+tabout P4_sector total if crit_A == 1 using "$out/Results.xls", ///
+    append sum c(N L4) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track A: amount saved in a typical month (L4, FCFA), savers, by aspired sector: number of savers")
+
+tabout P4_sector total if crit_A == 1 using "$out/Results.xls", ///
+    append sum c(p25 L4) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track A: amount saved in a typical month (L4, FCFA), savers, by aspired sector: 25th percentile")
+
+tabout P4_sector total if crit_A == 1 using "$out/Results.xls", ///
+    append sum c(median L4) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track A: amount saved in a typical month (L4, FCFA), savers, by aspired sector: median")
+
+tabout P4_sector total if crit_A == 1 using "$out/Results.xls", ///
+    append sum c(p75 L4) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track A: amount saved in a typical month (L4, FCFA), savers, by aspired sector: 75th percentile")
 
 * Credit access: accounts (L1, L2), current loan (L6), source of loan (L7)
 tabout L1 P4_sector if crit_A == 1 using "$out/Results.xls", ///
@@ -418,17 +436,17 @@ tabout L6 P4_sector if crit_A == 1 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 4 - Track A: currently has a loan or debt (L6), by aspired sector")
 
-tabout L7 if crit_A == 1 & L6 == 1 using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 4 - Track A: main source of the loan (L7), those with a loan")
+tabout L7 total if crit_A == 1 & L6 == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track A: main source of the loan (L7), those with a loan")
 
 *------------------------------------------------------------------------------*
 * 5.2 Track B (existing enterprise): registration, employees, earnings
 *------------------------------------------------------------------------------*
 * Registration (H4; Don't know shown)
-tabout H4 if crit_B == 1 using "$out/Results.xls", ///
-    append oneway mi c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 4 - Track B: activity is registered (H4)")
+tabout H4 total if crit_B == 1 using "$out/Results.xls", ///
+    append mi c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track B: activity is registered (H4)")
 
 * Paid workers excluding self (H4A; asked of employers and own-account workers)
 gen byte workers_cat = 0 if H4A == 0
@@ -439,43 +457,67 @@ label define workers_cat 0 "None" 1 "1" 2 "2 to 4" 3 "5 or more"
 label values workers_cat workers_cat
 label var workers_cat "Number of paid workers (H4A, grouped)"
 
-tabout workers_cat if crit_B == 1 using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 4 - Track B: number of paid workers, excluding self (H4A)")
+tabout workers_cat total if crit_B == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track B: number of paid workers, excluding self (H4A)")
 
 * Earnings from the activity last month (H5, FCFA); refusals (.r) excluded
-tabout track if crit_B == 1 using "$out/Results.xls", ///
-    append sum oneway c(N H5 p25 H5 median H5 p75 H5 mean H5) format(0c 0c 0c 0c 0c) style(xls) ///
-    title("Analysis 4 - Track B: earnings from the activity last month (H5, FCFA)")
+tabout track total if crit_B == 1 using "$out/Results.xls", ///
+    append sum c(N H5) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): number reporting")
+
+tabout track total if crit_B == 1 using "$out/Results.xls", ///
+    append sum c(p25 H5) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): 25th percentile")
+
+tabout track total if crit_B == 1 using "$out/Results.xls", ///
+    append sum c(median H5) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): median")
+
+tabout track total if crit_B == 1 using "$out/Results.xls", ///
+    append sum c(p75 H5) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): 75th percentile")
+
+tabout track total if crit_B == 1 using "$out/Results.xls", ///
+    append sum c(mean H5) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): mean")
 
 * Bracket for those who would not give the amount (H5A)
-tabout H5A if crit_B == 1 & H5 == .r using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 4 - Track B: earnings bracket (H5A, FCFA), those who would not give the amount")
+tabout H5A total if crit_B == 1 & H5 == .r using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track B: earnings bracket (H5A, FCFA), those who would not give the amount")
 
 *------------------------------------------------------------------------------*
 * 5.3 Track C (apprenticeship): shocks, resilience and household vulnerability
 *------------------------------------------------------------------------------*
 * Shock and resilience module (N)
-tabout N1 if crit_C == 1 using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 4 - Track C: household affected by a shock, last 12 months (N1)")
+tabout N1 total if crit_C == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track C: household affected by a shock, last 12 months (N1)")
 
-tabout N3 if crit_C == 1 & N1 == 1 using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 4 - Track C: impact of the shock (N3), households with a shock")
+tabout N3 total if crit_C == 1 & N1 == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track C: impact of the shock (N3), households with a shock")
 
-tabout N5 if crit_C == 1 & N1 == 1 using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 4 - Track C: time to recover from the shock (N5), households with a shock")
+tabout N5 total if crit_C == 1 & N1 == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track C: time to recover from the shock (N5), households with a shock")
 
-tabout N6 if crit_C == 1 using "$out/Results.xls", ///
-    append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    title("Analysis 4 - Track C: could raise 250,000 FCFA for an emergency (N6)")
+tabout N6 total if crit_C == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track C: could raise 250,000 FCFA for an emergency (N6)")
 
-tabout track if crit_C == 1 using "$out/Results.xls", ///
-    append sum oneway c(N N7 median N7 mean N7) format(0c 0c 1c) style(xls) ///
-    title("Analysis 4 - Track C: ability to withstand an economic shock (N7, 1-10)")
+tabout N7 total if crit_C == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track C: ability to withstand an economic shock (N7, 1 = lowest, 10 = highest)")
+
+tabout track total if crit_C == 1 using "$out/Results.xls", ///
+    append sum c(median N7) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track C: ability to withstand an economic shock (N7, 1-10): median")
+
+tabout track total if crit_C == 1 using "$out/Results.xls", ///
+    append sum c(mean N7) format(1c) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track C: ability to withstand an economic shock (N7, 1-10): mean")
 
 * Household vulnerability score: count of 5 risk signs (0-5)
 *   1 Could not raise 250,000 FCFA in an emergency (N6 = No, impossible)
@@ -502,14 +544,15 @@ label var vuln_score "Household vulnerability score (0-5)"
 * Spot check
 tab vuln_score if crit_C == 1, missing
 
-tabout vuln_score if crit_C == 1 using "$out/Results.xls", ///
-    append oneway c(freq col cum) format(0c 1p 1p) layout(cb) style(xls) ///
-    title("Analysis 4 - Track C: household vulnerability score (0-5): number and cumulative % at each score")
+tabout vuln_score total if crit_C == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track C: household vulnerability score (0-5): number and % at each score")
 
-tabout track if crit_C == 1 using "$out/Results.xls", ///
-    append sum oneway c(mean vuln_1 mean vuln_2 mean vuln_3 mean vuln_4 mean vuln_5) ///
-    format(2 2 2 2 2) style(xls) ///
-    title("Analysis 4 - Track C: share with each vulnerability sign (N6 emergency funds, M2 outside help, D4 no earner, D2/D1 half under 15, D5 few assets)")
+label values vuln_1 vuln_2 vuln_3 vuln_4 vuln_5 yesno
+
+tabout vuln_1 vuln_2 vuln_3 vuln_4 vuln_5 total if crit_C == 1 using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 4 - Track C: vulnerability signs (N6 emergency funds, M2 outside help, D4 no earner, D2/D1 half under 15, D5 few assets)")
 
 *==============================================================================*
 * 6. ANALYSIS 5 - GENDER-DIFFERENTIATED CONSTRAINTS
@@ -528,9 +571,21 @@ tabout D3 C1 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 5 - Relationship to household head (D3) by sex")
 
-tabout C1 using "$out/Results.xls", ///
-    append sum oneway c(mean D1 median D1 mean D2 mean D4) format(1 0 1 1) style(xls) ///
-    title("Analysis 5 - Household size (D1), members under 15 (D2), members in paid work (D4) by sex: mean / median")
+tabout total C1 using "$out/Results.xls", ///
+    append sum c(mean D1) format(1c) layout(cb) style(xls) ///
+    h1("Analysis 5 - Household size (D1) by sex: mean")
+
+tabout total C1 using "$out/Results.xls", ///
+    append sum c(median D1) format(0c) layout(cb) style(xls) ///
+    h1("Analysis 5 - Household size (D1) by sex: median")
+
+tabout total C1 using "$out/Results.xls", ///
+    append sum c(mean D2) format(1c) layout(cb) style(xls) ///
+    h1("Analysis 5 - Household members under 15 (D2) by sex: mean")
+
+tabout total C1 using "$out/Results.xls", ///
+    append sum c(mean D4) format(1c) layout(cb) style(xls) ///
+    h1("Analysis 5 - Household members in paid work (D4) by sex: mean")
 
 *------------------------------------------------------------------------------*
 * 6.2 Rural/urban
@@ -579,7 +634,7 @@ tabout N6 C1 using "$out/Results.xls", ///
 
 * Vulnerability score from Analysis 4 (section 5.3), all applicants
 tabout vuln_score C1 using "$out/Results.xls", ///
-    append c(freq col cum) format(0c 1p 1p) layout(cb) style(xls) ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 5 - Household vulnerability score (0-5) by sex")
 
 *------------------------------------------------------------------------------*
@@ -634,9 +689,13 @@ preserve
 
     tab id_female, missing
 
-    tabout id_female using "$out/Results.xls", ///
-        append oneway c(freq col) format(0c 1p) layout(cb) style(xls) ///
-        title("Analysis 5 - Called sample (one row per cover_id) by sex from the ID prefix")
+    gen byte total = 1
+    label define total 1 "All", modify
+    label values total total
+
+    tabout id_female total using "$out/Results.xls", ///
+        append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+        h1("Analysis 5 - Called sample (one row per cover_id) by sex from the ID prefix")
 
     * Column %: rate of reaching each stage by sex. Row % (Yes row): share
     * of women among those reaching the stage.
