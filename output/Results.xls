@@ -791,3 +791,118 @@ No	174	230	3	11	42	460	68.2%	82.4%	60.0%	64.7%	60.9%	73.6%
 Yes	81	49	2	6	27	165	31.8%	17.6%	40.0%	35.3%	39.1%	26.4%
 Total	255	279	5	17	69	625	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%
 
+Analysis 7 - Applicants by region and urban/rural: number and % of all applicants
+B2. Region	Urban	Rural	Total	Urban	Rural	Total
+	No.	No.	No.	%	%	%
+KABADOUGOU	3	31	34	0.5%	4.9%	5.4%
+FOLON	9	24	33	1.4%	3.8%	5.3%
+PORO	33	106	139	5.3%	16.9%	22.1%
+BAGOUE	3	15	18	0.5%	2.4%	2.9%
+TCHOLOGO	6	100	106	1.0%	15.9%	16.9%
+WORODOUGOU	20	22	42	3.2%	3.5%	6.7%
+BAFING	2	12	14	0.3%	1.9%	2.2%
+BERE	8	44	52	1.3%	7.0%	8.3%
+GONTOUGO	24	120	144	3.8%	19.1%	22.9%
+BOUNKANI	8	38	46	1.3%	6.1%	7.3%
+Total	116	512	628	18.5%	81.5%	100.0%
+
+Analysis 7 - Provisional track by cluster (region x urban/rural): row % = track mix within the cluster
+Cluster: region x urban/rural	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total
+	No.	No.	No.	No.	No.	No.	%	%	%	%	%	%
+KABADOUGOU Urban	2	0	0	0	1	3	66.7%	0.0%	0.0%	0.0%	33.3%	100.0%
+KABADOUGOU Rural	12	17	0	0	2	31	38.7%	54.8%	0.0%	0.0%	6.5%	100.0%
+FOLON Urban	6	1	0	2	0	9	66.7%	11.1%	0.0%	22.2%	0.0%	100.0%
+FOLON Rural	10	9	1	0	4	24	41.7%	37.5%	4.2%	0.0%	16.7%	100.0%
+PORO Urban	10	17	0	1	5	33	30.3%	51.5%	0.0%	3.0%	15.2%	100.0%
+PORO Rural	65	26	0	3	12	106	61.3%	24.5%	0.0%	2.8%	11.3%	100.0%
+BAGOUE Urban	1	2	0	0	0	3	33.3%	66.7%	0.0%	0.0%	0.0%	100.0%
+BAGOUE Rural	5	6	2	1	1	15	33.3%	40.0%	13.3%	6.7%	6.7%	100.0%
+TCHOLOGO Urban	5	1	0	0	0	6	83.3%	16.7%	0.0%	0.0%	0.0%	100.0%
+TCHOLOGO Rural	37	44	1	0	18	100	37.0%	44.0%	1.0%	0.0%	18.0%	100.0%
+WORODOUGOU Urban	10	10	0	0	0	20	50.0%	50.0%	0.0%	0.0%	0.0%	100.0%
+WORODOUGOU Rural	11	7	0	0	4	22	50.0%	31.8%	0.0%	0.0%	18.2%	100.0%
+BAFING Urban	1	1	0	0	0	2	50.0%	50.0%	0.0%	0.0%	0.0%	100.0%
+BAFING Rural	1	10	0	0	1	12	8.3%	83.3%	0.0%	0.0%	8.3%	100.0%
+BERE Urban	0	5	0	0	3	8	0.0%	62.5%	0.0%	0.0%	37.5%	100.0%
+BERE Rural	11	25	0	1	7	44	25.0%	56.8%	0.0%	2.3%	15.9%	100.0%
+GONTOUGO Urban	11	10	0	1	2	24	45.8%	41.7%	0.0%	4.2%	8.3%	100.0%
+GONTOUGO Rural	26	80	1	6	7	120	21.7%	66.7%	0.8%	5.0%	5.8%	100.0%
+BOUNKANI Urban	6	1	0	0	1	8	75.0%	12.5%	0.0%	0.0%	12.5%	100.0%
+BOUNKANI Rural	27	8	0	2	1	38	71.1%	21.1%	0.0%	5.3%	2.6%	100.0%
+Total	257	280	5	17	69	628	40.9%	44.6%	0.8%	2.7%	11.0%	100.0%
+
+Analysis 7 - Number of sub-prefectures with applicants, by cluster
+Cluster: region x urban/rural	All	Total
+	Mean n sp	Mean n sp
+KABADOUGOU Urban	2	2
+KABADOUGOU Rural	5	5
+FOLON Urban	1	1
+FOLON Rural	2	2
+PORO Urban	6	6
+PORO Rural	13	13
+BAGOUE Urban	3	3
+BAGOUE Rural	6	6
+TCHOLOGO Urban	3	3
+TCHOLOGO Rural	7	7
+WORODOUGOU Urban	1	1
+WORODOUGOU Rural	4	4
+BAFING Urban	2	2
+BAFING Rural	7	7
+BERE Urban	3	3
+BERE Rural	6	6
+GONTOUGO Urban	3	3
+GONTOUGO Rural	10	10
+BOUNKANI Urban	3	3
+BOUNKANI Rural	5	5
+Total	5	5
+
+Analysis 7 - Average number of applicants per sub-prefecture, by cluster
+Cluster: region x urban/rural	All	Total
+	Mean per sp	Mean per sp
+KABADOUGOU Urban	1.5	1.5
+KABADOUGOU Rural	6.2	6.2
+FOLON Urban	9.0	9.0
+FOLON Rural	12.0	12.0
+PORO Urban	5.5	5.5
+PORO Rural	8.2	8.2
+BAGOUE Urban	1.0	1.0
+BAGOUE Rural	2.5	2.5
+TCHOLOGO Urban	2.0	2.0
+TCHOLOGO Rural	14.3	14.3
+WORODOUGOU Urban	20.0	20.0
+WORODOUGOU Rural	5.5	5.5
+BAFING Urban	1.0	1.0
+BAFING Rural	1.7	1.7
+BERE Urban	2.7	2.7
+BERE Rural	7.3	7.3
+GONTOUGO Urban	8.0	8.0
+GONTOUGO Rural	12.0	12.0
+BOUNKANI Urban	2.3	2.3
+BOUNKANI Rural	7.6	7.6
+Total	6.5	6.5
+
+Analysis 7 - Sparse cluster flag (1 = fewer than 5 applicants per sub-prefecture), by cluster
+Cluster: region x urban/rural	All	Total
+	Mean sparse	Mean sparse
+KABADOUGOU Urban	1	1
+KABADOUGOU Rural	0	0
+FOLON Urban	0	0
+FOLON Rural	0	0
+PORO Urban	0	0
+PORO Rural	0	0
+BAGOUE Urban	1	1
+BAGOUE Rural	1	1
+TCHOLOGO Urban	1	1
+TCHOLOGO Rural	0	0
+WORODOUGOU Urban	0	0
+WORODOUGOU Rural	0	0
+BAFING Urban	1	1
+BAFING Rural	1	1
+BERE Urban	1	1
+BERE Rural	0	0
+GONTOUGO Urban	0	0
+GONTOUGO Rural	0	0
+BOUNKANI Urban	1	1
+BOUNKANI Rural	0	0
+Total	0	0
+
