@@ -19,6 +19,7 @@
     4. Analysis 3 - Skills baseline by track
     5. Analysis 4 - Financial constraint profile by track
     6. Analysis 5 - Gender-differentiated constraints
+    7. Analysis 6 - Behavioural and SEL baseline by track
 
   ------------------------------------------------------------------------------
   Analysis 1 - Track size
@@ -706,7 +707,61 @@ preserve
 restore
 
 *==============================================================================*
-* 7. ANALYSIS 6 - (next analysis goes here; tables use -append-)
+* 7. ANALYSIS 6 - BEHAVIOURAL AND SEL BASELINE BY TRACK
+*==============================================================================*
+* Questions used (the analysis plan calls them K1, K4, K2, O3, O4; in this
+* questionnaire they are in modules M and Q):
+*   M1 : how you make a living now (dependent / partly / fully self-supporting)
+*   M4 : in 12 months, expect to be self-supporting or dependent
+*   M2 : received external help for basic needs, last 12 months
+*   Q3 : generalised trust
+*   Q4 : trust in youth of a different origin (bridging trust)
+
+*------------------------------------------------------------------------------*
+* 7.1 Mindset: current economic role (M1) and 12-month projection (M4)
+*------------------------------------------------------------------------------*
+tabout M1 track using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 6 - How applicants make a living now (M1) by provisional track")
+
+tabout M4 track using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 6 - Expected situation in 12 months (M4) by provisional track")
+
+* Mindset segments: current role (rows) by 12-month projection (columns)
+tabout M1 M4 using "$out/Results.xls", ///
+    append c(freq row) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 6 - Current economic role (M1, rows) by 12-month projection (M4, columns): row %")
+
+*------------------------------------------------------------------------------*
+* 7.2 External assistance (M2) by track
+*------------------------------------------------------------------------------*
+tabout M2 track using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 6 - Received external help for basic needs, last 12 months (M2) by provisional track")
+
+*------------------------------------------------------------------------------*
+* 7.3 Social capital: generalised (Q3) and bridging trust (Q4) by track
+*------------------------------------------------------------------------------*
+tabout Q3 track using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 6 - Generalised trust (Q3) by provisional track")
+
+tabout Q4 track using "$out/Results.xls", ///
+    append mi c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 6 - Trust in youth of a different origin (Q4, bridging trust) by provisional track")
+
+* Low bridging trust: not at all / just a little (Q4 = 1, 2); Don't know excluded
+gen byte low_bridging = inlist(Q4, 1, 2) if inlist(Q4, 1, 2, 3, 4)
+label var low_bridging "Low bridging trust (Q4: not at all / just a little)"
+label values low_bridging yesno
+
+tabout low_bridging track using "$out/Results.xls", ///
+    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 6 - Low bridging trust (Q4 not at all / just a little) by provisional track")
+
+*==============================================================================*
+* 8. ANALYSIS 7 - (next analysis goes here; tables use -append-)
 *==============================================================================*
 
 log close
