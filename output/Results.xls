@@ -482,13 +482,13 @@ Analysis 4 - Track C: ability to withstand an economic shock (N7, 1 = lowest, 10
 N7. Ability to withstand an economic shock (1-10)	All	Total	All	Total
 	No.	No.	%	%
 1 (lowest)	7	7	31.8%	31.8%
-	4	4	18.2%	18.2%
-	4	4	18.2%	18.2%
-	2	2	9.1%	9.1%
-	2	2	9.1%	9.1%
-	1	1	4.5%	4.5%
-	1	1	4.5%	4.5%
-	1	1	4.5%	4.5%
+2	4	4	18.2%	18.2%
+3	4	4	18.2%	18.2%
+4	2	2	9.1%	9.1%
+5	2	2	9.1%	9.1%
+6	1	1	4.5%	4.5%
+8	1	1	4.5%	4.5%
+9	1	1	4.5%	4.5%
 Total	22	22	100.0%	100.0%
 
 Analysis 4 - Track C: ability to withstand an economic shock (N7, 1-10): median
@@ -711,7 +711,7 @@ Undetermined	0.12	0.18	0.13
 Total	0.20	0.20	0.20
 
 Analysis 5 - Called sample (one row per cover_id) by sex from the ID prefix
-(firstnm) id_female	All	Total	All	Total
+Sex from the cover_id prefix	All	Total	All	Total
 	No.	No.	%	%
 Male (H- ID)	631	631	65.6%	65.6%
 Female (F- ID)	331	331	34.4%	34.4%
@@ -734,4 +734,60 @@ Completed interview, any attempt
 No	225	127	352	35.7%	38.4%	36.6%	63.9%	36.1%	100.0%
 Yes	406	204	610	64.3%	61.6%	63.4%	66.6%	33.4%	100.0%
 Total	631	331	962	100.0%	100.0%	100.0%	65.6%	34.4%	100.0%
+
+Analysis 6 - How applicants make a living now (M1) by provisional track
+M1. How you currently make a living	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total
+	No.	No.	No.	No.	No.	No.	%	%	%	%	%	%
+Mainly dependent on help from others	46	17	1	7	9	80	17.9%	6.1%	20.0%	41.2%	13.0%	12.7%
+Self-supporting for some needs	140	143	4	7	39	333	54.5%	51.1%	80.0%	41.2%	56.5%	53.0%
+Fully self-supporting	71	120	0	3	21	215	27.6%	42.9%	0.0%	17.6%	30.4%	34.2%
+Total	257	280	5	17	69	628	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%
+
+Analysis 6 - Expected situation in 12 months (M4) by provisional track
+M4. In 12 months, expect to be self-supporting or dependent	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total
+	No.	No.	No.	No.	No.	No.	%	%	%	%	%	%
+Mainly dependent on help from others	33	10	0	3	6	52	12.8%	3.6%	0.0%	17.6%	8.7%	8.3%
+Self-supporting for some needs	118	139	3	9	37	306	45.9%	49.6%	60.0%	52.9%	53.6%	48.7%
+Fully self-supporting	106	131	2	5	26	270	41.2%	46.8%	40.0%	29.4%	37.7%	43.0%
+Total	257	280	5	17	69	628	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%
+
+Analysis 6 - Current economic role (M1, rows) by 12-month projection (M4, columns): row %
+M1. How you currently make a living	Mainly dependent on help from others	Self-supporting for some needs	Fully self-supporting	Total	Mainly dependent on help from others	Self-supporting for some needs	Fully self-supporting	Total
+	No.	No.	No.	No.	%	%	%	%
+Mainly dependent on help from others	43	28	9	80	53.8%	35.0%	11.2%	100.0%
+Self-supporting for some needs	9	253	71	333	2.7%	76.0%	21.3%	100.0%
+Fully self-supporting	0	25	190	215	0.0%	11.6%	88.4%	100.0%
+Total	52	306	270	628	8.3%	48.7%	43.0%	100.0%
+
+Analysis 6 - Received external help for basic needs, last 12 months (M2) by provisional track
+M2. Received external help for basic needs, last 12 months	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total
+	No.	No.	No.	No.	No.	No.	%	%	%	%	%	%
+Yes, regularly	10	15	0	1	4	30	3.9%	5.4%	0.0%	5.9%	5.8%	4.8%
+Yes, occasionally	44	73	1	2	15	135	17.1%	26.1%	20.0%	11.8%	21.7%	21.5%
+No, never	203	192	4	14	50	463	79.0%	68.6%	80.0%	82.4%	72.5%	73.7%
+Total	257	280	5	17	69	628	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%
+
+Analysis 6 - Generalised trust (Q3) by provisional track
+Q3. Generalised trust	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total
+	No.	No.	No.	No.	No.	No.	%	%	%	%	%	%
+Most people can be trusted	81	106	2	3	19	211	31.5%	37.9%	40.0%	17.6%	27.5%	33.6%
+Need to be very careful	176	174	3	14	50	417	68.5%	62.1%	60.0%	82.4%	72.5%	66.4%
+Total	257	280	5	17	69	628	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%
+
+Analysis 6 - Trust in youth of a different origin (Q4, bridging trust) by provisional track
+Q4. Trust in youth of different origin	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total
+	No.	No.	No.	No.	No.	No.	%	%	%	%	%	%
+Not at all	4	2	1	2	3	12	1.6%	0.7%	20.0%	11.8%	4.3%	1.9%
+Just a little	77	47	1	4	24	153	30.0%	16.8%	20.0%	23.5%	34.8%	24.4%
+Somewhat	72	90	1	4	19	186	28.0%	32.1%	20.0%	23.5%	27.5%	29.6%
+A lot	102	140	2	7	23	274	39.7%	50.0%	40.0%	41.2%	33.3%	43.6%
+Don't know	2	1	0	0	0	3	0.8%	0.4%	0.0%	0.0%	0.0%	0.5%
+Total	257	280	5	17	69	628	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%
+
+Analysis 6 - Low bridging trust (Q4 not at all / just a little) by provisional track
+Low bridging trust (Q4: not at all / just a little)	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total	Track A - Start-up	Track B - Existing enterprise growth	Track C - Apprenticeship to work	Tracks A and C (both apply)	Undetermined	Total
+	No.	No.	No.	No.	No.	No.	%	%	%	%	%	%
+No	174	230	3	11	42	460	68.2%	82.4%	60.0%	64.7%	60.9%	73.6%
+Yes	81	49	2	6	27	165	31.8%	17.6%	40.0%	35.3%	39.1%	26.4%
+Total	255	279	5	17	69	625	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%
 
