@@ -20,6 +20,7 @@
     5. Analysis 4 - Financial constraint profile by track
     6. Analysis 5 - Gender-differentiated constraints
     7. Analysis 6 - Behavioural and SEL baseline by track
+    8. Analysis 7 - Geographic delivery planning
 
   ------------------------------------------------------------------------------
   Analysis 1 - Track size
@@ -761,7 +762,75 @@ tabout low_bridging track using "$out/Results.xls", ///
     h1("Analysis 6 - Low bridging trust (Q4 not at all / just a little) by provisional track")
 
 *==============================================================================*
-* 8. ANALYSIS 7 - (next analysis goes here; tables use -append-)
+* 8. ANALYSIS 7 - GEOGRAPHIC DELIVERY PLANNING
+*==============================================================================*
+* Cluster = region (B2) x urban/rural (B5).
+* Density = number of applicants in the cluster (no area data available).
+* Dispersion = number of sub-prefectures (B4) the cluster's applicants live
+* in, and the average number of applicants per sub-prefecture.
+* Provisional sparse flag: fewer than 5 applicants per sub-prefecture on
+* average (too few to fill a local class without travel or mobile delivery).
+* The underlying numbers are shown so the cutoff can be changed.
+
+egen cluster = group(B2 B5), label
+label var cluster "Cluster: region x urban/rural"
+
+*------------------------------------------------------------------------------*
+* 8.1 Applicant density by region x urban/rural
+*------------------------------------------------------------------------------*
+tabout B2 B5 using "$out/Results.xls", ///
+    append c(freq cell) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 7 - Applicants by region and urban/rural: number and % of all applicants")
+
+*------------------------------------------------------------------------------*
+* 8.2 Provisional track mix in each cluster
+*------------------------------------------------------------------------------*
+tabout cluster track using "$out/Results.xls", ///
+    append c(freq row) format(0c 1p) layout(cb) style(xls) ///
+    h1("Analysis 7 - Provisional track by cluster (region x urban/rural): row % = track mix within the cluster")
+
+*------------------------------------------------------------------------------*
+* 8.3 Dispersion: how spread out each cluster's applicants are
+*------------------------------------------------------------------------------*
+* Applicants without a sub-prefecture are left out of the dispersion measures
+count if missing(B4)
+
+preserve
+    keep if !missing(cluster)
+    gen byte one = 1
+    gen byte has_b4 = !missing(B4)
+    egen sp_tag = tag(cluster B4) if !missing(B4)
+    collapse (sum) n = one n_b4 = has_b4 n_sp = sp_tag, by(cluster)
+
+    gen per_sp = n_b4 / n_sp
+    gen byte sparse = (per_sp < 5) if !missing(per_sp)
+
+    label var n      "Applicants in the cluster"
+    label var n_sp   "Sub-prefectures with applicants"
+    label var per_sp "Applicants per sub-prefecture (average)"
+    label var sparse "Sparse cluster (fewer than 5 applicants per sub-prefecture)"
+
+    * Spot check
+    list cluster n n_b4 n_sp per_sp sparse, noobs
+
+    gen byte total = 1
+    label values total total
+
+    tabout cluster total using "$out/Results.xls", ///
+        append sum c(mean n_sp) format(0c) layout(cb) style(xls) ///
+        h1("Analysis 7 - Number of sub-prefectures with applicants, by cluster")
+
+    tabout cluster total using "$out/Results.xls", ///
+        append sum c(mean per_sp) format(1c) layout(cb) style(xls) ///
+        h1("Analysis 7 - Average number of applicants per sub-prefecture, by cluster")
+
+    tabout cluster total using "$out/Results.xls", ///
+        append sum c(mean sparse) format(0c) layout(cb) style(xls) ///
+        h1("Analysis 7 - Sparse cluster flag (1 = fewer than 5 applicants per sub-prefecture), by cluster")
+restore
+
+*==============================================================================*
+* 9. ANALYSIS 8 - (next analysis goes here; tables use -append-)
 *==============================================================================*
 
 log close
