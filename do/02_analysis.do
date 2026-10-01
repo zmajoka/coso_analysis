@@ -24,25 +24,17 @@
 
   ------------------------------------------------------------------------------
   Analysis 1 - Track size
-  Provisional track rule
-    Track A - Start-up
-        K1 = No (never started an income-generating activity)
-        AND K2 = Yes (would like to start one)
-    Track B - Existing enterprise growth
-        K1 = Yes AND main job F1 = employer, own-account worker or member of
-        a producers' cooperative
-    Track C - Apprenticeship to work
-        Aspired sector (P4_sector) is a skilled trade: manufacturing,
-        construction, transport, accommodation/food, ICT/digital, other
-        services (repair, personal, arts)
-        (no condition on employment status or prior training)
-        NOTE: the original rule also required being not employed (E1-E3A).
-        That condition was removed because only 22 of 628 applicants
-        qualified for Track C with it (90% of applicants are employed).
-    Tracks A and C, and Tracks B and C, can overlap: each overlap is
-    reported as a separate category (overlap rule still to be decided).
-    A and B cannot overlap (K1).
-    Undetermined - everyone else, split by reason.
+  Provisional track rule: from the aspirations module only (P2,
+  "Souhaitez-vous principalement trouver un emploi salarie, creer une
+  entreprise ou developper une activite existante ?")
+    Track A - Start-up                    : P2 = 2 (start a business)
+    Track B - Existing enterprise growth  : P2 = 3 (grow an existing activity)
+    Track C - Apprenticeship to work      : P2 = 1 (find a wage job)
+    Undetermined                          : P2 not answered
+  One question, so the tracks cannot overlap.
+  NOTE: this replaces an earlier rule built from K1, K2, F1, P4 and
+  employment status (E1-E3A). Under that rule, Track C required being not
+  employed, which left only 22 of 628 applicants in Track C.
 ==============================================================================*/
 
 version 17
@@ -91,87 +83,34 @@ label var total "All"
 *==============================================================================*
 
 *------------------------------------------------------------------------------*
-* 2.1 Track criteria
+* 2.1 Provisional track (P2)
 *------------------------------------------------------------------------------*
-* Inputs: spot check
-tab K1, missing
-tab K2 if K1 == 0, missing
-tab F1 if K1 == 1, missing
-tab employed, missing
-tab P4_sector if employed == 0, missing
+* Spot check
+tab P2, missing
 
-* Track A: never started an activity and wants to start one
-gen byte crit_A = (K1 == 0 & K2 == 1)
-label var crit_A "Meets Track A criteria (K1 = No, K2 = Yes)"
-
-* Track B: has started an activity and is employer / own-account / cooperative
-gen byte crit_B = (K1 == 1 & inlist(F1, 2, 3, 4))
-label var crit_B "Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)"
-
-* Track C: aspires to a skilled-trade sector
-*   P4_sector: 3 Manufacturing, 4 Construction, 6 Transport, 7 Accommodation/food,
-*       8 ICT/digital, 14 Other services (repair, personal, arts)
-*   NOTE: the "not employed" condition (employed == 0) of the original rule
-*   is removed: with it, only 22 of 628 applicants qualified for Track C.
-gen byte crit_C = inlist(P4_sector, 3, 4, 6, 7, 8, 14)
-label var crit_C "Meets Track C criteria (aspires to a skilled trade)"
-
-label values crit_A crit_B crit_C yesno
-
-* Check: A and B never overlap (should be 0)
-count if crit_B == 1 & crit_A == 1
-
-* Overlaps with Track C
-count if crit_A == 1 & crit_C == 1
-count if crit_B == 1 & crit_C == 1
-
-*------------------------------------------------------------------------------*
-* 2.2 Provisional track
-*------------------------------------------------------------------------------*
-gen byte track = 6
-replace track = 1 if crit_A == 1 & crit_C == 0
-replace track = 2 if crit_B == 1 & crit_C == 0
-replace track = 3 if crit_C == 1 & crit_A == 0 & crit_B == 0
-replace track = 4 if crit_A == 1 & crit_C == 1
-replace track = 5 if crit_B == 1 & crit_C == 1
+gen byte track = 4
+replace track = 1 if P2 == 2
+replace track = 2 if P2 == 3
+replace track = 3 if P2 == 1
 
 label define track 1 "Track A - Start-up"                    ///
                    2 "Track B - Existing enterprise growth"  ///
                    3 "Track C - Apprenticeship to work"      ///
-                   4 "Tracks A and C (both apply)"           ///
-                   5 "Tracks B and C (both apply)"           ///
-                   6 "Undetermined"
+                   4 "Undetermined (P2 not answered)"
 label values track track
-label var track "Provisional programme track"
+label var track "Provisional programme track (P2)"
 
-* Reason for undetermined
-*   (none of them aspires to a skilled trade)
-*   1 Employed, but not employer/own-account/coop with an own activity
-*     (wage worker, family worker, apprentice, or never started an activity
-*     and not wanting to)
-*   2 Not employed, started an activity before (no longer running it)
-*   3 Not employed, never started, no wish to start
-*   4 Missing information (K1, employment or P4_sector)
-gen byte undet_reason = .
-replace undet_reason = 4 if track == 6 & (missing(K1) | missing(employed))
-replace undet_reason = 1 if track == 6 & missing(undet_reason) & employed == 1
-replace undet_reason = 2 if track == 6 & missing(undet_reason) & employed == 0 & K1 == 1
-replace undet_reason = 3 if track == 6 & missing(undet_reason) & employed == 0 & K1 == 0
-replace undet_reason = 4 if track == 6 & missing(undet_reason)
+* One indicator per track, used in the later analyses
+gen byte crit_A = (track == 1)
+gen byte crit_B = (track == 2)
+gen byte crit_C = (track == 3)
+label var crit_A "Track A: wants to start a business (P2 = 2)"
+label var crit_B "Track B: wants to grow an existing activity (P2 = 3)"
+label var crit_C "Track C: wants a wage job (P2 = 1)"
+label values crit_A crit_B crit_C yesno
 
-label define undet_reason                                                    ///
-    1 "Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)" ///
-    2 "Not employed, had an activity before (closed)"                         ///
-    3 "Not employed, never started, no wish to start"                         ///
-    4 "Missing information"
-label values undet_reason undet_reason
-label var undet_reason "Reason track is undetermined"
-
-* Spot checks
-tab track, missing
-tab undet_reason if track == 6, missing
-tab track employed, missing
-tab track K1, missing
+* Spot check
+tab track P2, missing
 
 *------------------------------------------------------------------------------*
 * 2.3 Tables
@@ -180,27 +119,9 @@ tab track K1, missing
 * 2.3.1 Track size
 tabout track total using "$out/Results.xls", ///
     replace c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 1 - Provisional programme track - completed interviews")
+    h1("Analysis 1 - Provisional programme track (P2) - completed interviews")
 
-* 2.3.2 Criteria met (tracks A and C can overlap)
-tabout crit_A total using "$out/Results.xls", ///
-    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 1 - Meets Track A criteria: never started an activity and wants to start one")
-
-tabout crit_B total using "$out/Results.xls", ///
-    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative")
-
-tabout crit_C total using "$out/Results.xls", ///
-    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 1 - Meets Track C criteria: aspires to a skilled trade (no employment condition)")
-
-* 2.3.3 Why undetermined
-tabout undet_reason total if track == 6 using "$out/Results.xls", ///
-    append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 1 - Undetermined track - reason")
-
-* 2.3.4 Track by sex and by district
+* 2.3.2 Track by sex and by district
 tabout track C1 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Provisional track by sex")
@@ -209,7 +130,7 @@ tabout track B1 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Provisional track by district")
 
-* 2.3.5 Sensitivity: interview status and duplicate IDs
+* 2.3.3 Sensitivity: interview status and duplicate IDs
 tabout track status_ok using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Provisional track by interview status (Yes = Completed, No = rejected/assigned)")
@@ -334,7 +255,7 @@ restore
 *==============================================================================*
 * 4. ANALYSIS 3 - SKILLS BASELINE BY TRACK
 *==============================================================================*
-* Uses the provisional track from Analysis 1 (section 2).
+* Uses the provisional track from Analysis 1 (section 2, P2).
 *   K7     : self-rated business management skills
 *   O3     : vocational/technical training or apprenticeship, last 12 months
 *   O4     : field of that training (free text)
@@ -390,7 +311,7 @@ tabout train_match P4_sector using "$out/Results.xls", ///
 *------------------------------------------------------------------------------*
 * 4.3 Track C: unemployment duration (J2) by prior training and aspired sector
 *------------------------------------------------------------------------------*
-* Track C criteria met (crit_C: Track C alone, or with Track A or Track B).
+* Track C (crit_C: P2 = wants a wage job).
 * J2 is blank for the employed (section J not asked) and for those not
 * searching for work (J0 = No).
 tab J2 if crit_C == 1, missing
@@ -406,8 +327,7 @@ tabout J2 P4_sector if crit_C == 1 using "$out/Results.xls", ///
 *==============================================================================*
 * 5. ANALYSIS 4 - FINANCIAL CONSTRAINT PROFILE BY TRACK
 *==============================================================================*
-* Track groups use the criteria from Analysis 1 (section 2), so people meeting
-* both A and C criteria are in both groups:
+* Track groups from Analysis 1 (section 2, P2):
 *   Track A: crit_A == 1    Track B: crit_B == 1    Track C: crit_C == 1
 * Capital need for start-up is not asked in this questionnaire: to be added
 * when the source data (e.g. application forms) is merged by cover_id.
