@@ -681,6 +681,7 @@ preserve
     gen byte consented = (consent == 1)
     collapse (max) answered consented complete (firstnm) id_female, by(cover_id)
     label values id_female id_female
+    label var id_female "Sex from the cover_id prefix"
 
     label var answered  "Call answered and interview started (A4), any attempt"
     label var consented "Consented (B6D), any attempt"

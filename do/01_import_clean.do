@@ -864,7 +864,8 @@ label define N4 1 "Personal savings" 2 "Sale of assets" 3 "Borrowing / credit" /
 label define N5 1 "Less than 1 month" 2 "1 to 3 months" 3 "3 to 6 months"  ///
     4 "More than 6 months" 5 "Not yet recovered"
 label define N6 1 "Yes, easily" 2 "Yes, with difficulty" 3 "No, impossible"
-label define N7 1 "1 (lowest)" 10 "10 (highest)"
+label define N7 1 "1 (lowest)" 2 "2" 3 "3" 4 "4" 5 "5" 6 "6" 7 "7" 8 "8" 9 "9" ///
+    10 "10 (highest)"
 label define O5 1 "Formal vocational school / training centre"            ///
     2 "Employer / private firm" 3 "Government programme (e.g. Agence Emploi Jeunes)" ///
     4 "NGO / literacy or life-skills programme"                             ///

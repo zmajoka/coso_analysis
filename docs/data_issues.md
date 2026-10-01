@@ -110,6 +110,20 @@ new interview was opened instead of correcting the rejected one (see issue 1).
   refused. Brackets (H3A/H5A) are available.
 - **`localite`** has an encoding problem for at least one value ("FERK?").
 
+### 9. Sex in the `cover_id` prefix vs reported sex
+
+`cover_id` starts with F- (femme) or H- (homme). For 17 of the 628 completed
+interviews, the prefix and the reported sex (C1) disagree: 9 H- IDs report
+female, 8 F- IDs report male. This may be the same problem as issue 1 (an
+interview recorded under the wrong assignment), or a sex coding error in the
+sample list or in C1.
+
+### 10. Consent recorded without a completed call result
+
+At least 33 `cover_id`s have consent recorded (B6D = Oui) in an attempt where
+the call result A4 is not "Entretien réalisé". The order in the questionnaire
+(A4 first, then the consent script) should make this impossible.
+
 ---
 
 ## B. Questions for the firm
@@ -137,6 +151,10 @@ new interview was opened instead of correcting the rejected one (see issue 1).
    under 10 minutes?
 8. How are you planning the call-backs, and how will you report response rates
    and attrition (by district, sex, and treatment status if relevant)?
+9. For the 17 interviews where the F-/H- prefix and the reported sex differ:
+   which is correct?
+10. Why is consent recorded in attempts where the call result is not
+    "Entretien réalisé"? Is A4 being filled before or after the interview?
 
 ---
 
