@@ -1,31 +1,41 @@
-Provisional programme track	No.	%
-Track A - Start-up	257	40.9%
-Track B - Existing enterprise growth	280	44.6%
-Track C - Apprenticeship to work	5	0.8%
-Tracks A and C (both apply)	17	2.7%
-Undetermined	69	11.0%
-Total	628	100.0%
+Analysis 1 - Provisional programme track - completed interviews
+Provisional programme track	All	Total	All	Total
+	No.	No.	%	%
+Track A - Start-up	257	257	40.9%	40.9%
+Track B - Existing enterprise growth	280	280	44.6%	44.6%
+Track C - Apprenticeship to work	5	5	0.8%	0.8%
+Tracks A and C (both apply)	17	17	2.7%	2.7%
+Undetermined	69	69	11.0%	11.0%
+Total	628	628	100.0%	100.0%
 
-Meets Track A criteria (K1 = No, K2 = Yes)	No.	%
-No	354	56.4%
-Yes	274	43.6%
-Total	628	100.0%
+Analysis 1 - Meets Track A criteria: never started an activity and wants to start one
+Meets Track A criteria (K1 = No, K2 = Yes)	All	Total	All	Total
+	No.	No.	%	%
+No	354	354	56.4%	56.4%
+Yes	274	274	43.6%	43.6%
+Total	628	628	100.0%	100.0%
 
-Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)	No.	%
-No	348	55.4%
-Yes	280	44.6%
-Total	628	100.0%
+Analysis 1 - Meets Track B criteria: started an activity, now employer/own-account/cooperative
+Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)	All	Total	All	Total
+	No.	No.	%	%
+No	348	348	55.4%	55.4%
+Yes	280	280	44.6%	44.6%
+Total	628	628	100.0%	100.0%
 
-Meets Track C criteria (not employed, aspires to a skilled trade)	No.	%
-No	606	96.5%
-Yes	22	3.5%
-Total	628	100.0%
+Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade
+Meets Track C criteria (not employed, aspires to a skilled trade)	All	Total	All	Total
+	No.	No.	%	%
+No	606	606	96.5%	96.5%
+Yes	22	22	3.5%	3.5%
+Total	628	628	100.0%	100.0%
 
-Reason track is undetermined	No.	%
-Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)	53	76.8%
-Not employed, had an activity before (closed)	13	18.8%
-Not employed, no wish to start, aspiration not a skilled trade	3	4.3%
-Total	69	100.0%
+Analysis 1 - Undetermined track - reason
+Reason track is undetermined	All	Total	All	Total
+	No.	No.	%	%
+Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)	53	53	76.8%	76.8%
+Not employed, had an activity before (closed)	13	13	18.8%	18.8%
+Not employed, no wish to start, aspiration not a skilled trade	3	3	4.3%	4.3%
+Total	69	69	100.0%	100.0%
 
 Analysis 1 - Provisional track by sex
 Provisional programme track	Male	Female	Total	Male	Female	Total
@@ -57,13 +67,15 @@ Tracks A and C (both apply)	8	9	17	3.7%	2.2%	2.7%
 Undetermined	23	46	69	10.7%	11.1%	11.0%
 Total	214	414	628	100.0%	100.0%	100.0%
 
-Provisional programme track	No.	%
-Track A - Start-up	242	40.7%
-Track B - Existing enterprise growth	269	45.3%
-Track C - Apprenticeship to work	4	0.7%
-Tracks A and C (both apply)	15	2.5%
-Undetermined	64	10.8%
-Total	594	100.0%
+Analysis 1 - Provisional track - excluding cover_ids with more than one completed interview
+Provisional programme track	All	Total	All	Total
+	No.	No.	%	%
+Track A - Start-up	242	242	40.7%	40.7%
+Track B - Existing enterprise growth	269	269	45.3%	45.3%
+Track C - Apprenticeship to work	4	4	0.7%	0.7%
+Tracks A and C (both apply)	15	15	2.5%	2.5%
+Undetermined	64	64	10.8%	10.8%
+Total	594	594	100.0%	100.0%
 
 Analysis 2 - Aspired sector (P4, Other recoded) by region: number and % of the region's applicants
 Aspired sector (P4, with 'Other' recoded from P4X)	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAFING	BERE	GONTOUGO	BOUNKANI	Total	KABADOUGOU	FOLON	PORO	BAGOUE	TCHOLOGO	WORODOUGOU	BAFING	BERE	GONTOUGO	BOUNKANI	Total
@@ -283,20 +295,69 @@ Yes, occasionally	16	4	15	66	2	2	1	0	0	21	4	131	41.0%	57.1%	42.9%	51.2%	33.3%	10
 No, never	16	1	9	44	2	0	0	1	1	17	0	91	41.0%	14.3%	25.7%	34.1%	33.3%	0.0%	0.0%	33.3%	100.0%	37.8%	0.0%	33.2%
 Total	39	7	35	129	6	2	1	3	1	45	6	274	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%
 
-Aspired sector (P4, with 'Other' recoded from P4X)	N	P25	Median	P75
-	L4	L4	L4	L4
-Agriculture, livestock, fishing, forestry	16	5,000	10,000	25,000
-Manufacturing	5	10,000	15,000	30,000
-Construction	18	5,000	17,500	50,000
-Wholesale / retail trade	56	5,000	12,500	30,000
-Transport, storage, logistics	2	2,000	41,000	80,000
-Accommodation and food services	2	2,000	16,000	30,000
-Information, communication, digital	1	3,000	3,000	3,000
-Public administration	1	5,000	5,000	5,000
-Health and social work	0			
-Other services (repair, personal, arts)	21	5,000	10,000	25,000
-Other	4	4,000	5,000	7,500
-Total	126	5,000	10,000	30,000
+Analysis 4 - Track A: amount saved in a typical month (L4, FCFA), savers, by aspired sector: number of savers
+Aspired sector (P4, with 'Other' recoded from P4X)	All	Total
+	N L4	N L4
+Agriculture, livestock, fishing, forestry	16	16
+Manufacturing	5	5
+Construction	18	18
+Wholesale / retail trade	56	56
+Transport, storage, logistics	2	2
+Accommodation and food services	2	2
+Information, communication, digital	1	1
+Public administration	1	1
+Health and social work	0	0
+Other services (repair, personal, arts)	21	21
+Other	4	4
+Total	126	126
+
+Analysis 4 - Track A: amount saved in a typical month (L4, FCFA), savers, by aspired sector: 25th percentile
+Aspired sector (P4, with 'Other' recoded from P4X)	All	Total
+	P25 L4	P25 L4
+Agriculture, livestock, fishing, forestry	5,000	5,000
+Manufacturing	10,000	10,000
+Construction	5,000	5,000
+Wholesale / retail trade	5,000	5,000
+Transport, storage, logistics	2,000	2,000
+Accommodation and food services	2,000	2,000
+Information, communication, digital	3,000	3,000
+Public administration	5,000	5,000
+Health and social work		
+Other services (repair, personal, arts)	5,000	5,000
+Other	4,000	4,000
+Total	5,000	5,000
+
+Analysis 4 - Track A: amount saved in a typical month (L4, FCFA), savers, by aspired sector: median
+Aspired sector (P4, with 'Other' recoded from P4X)	All	Total
+	Median L4	Median L4
+Agriculture, livestock, fishing, forestry	10,000	10,000
+Manufacturing	15,000	15,000
+Construction	17,500	17,500
+Wholesale / retail trade	12,500	12,500
+Transport, storage, logistics	41,000	41,000
+Accommodation and food services	16,000	16,000
+Information, communication, digital	3,000	3,000
+Public administration	5,000	5,000
+Health and social work		
+Other services (repair, personal, arts)	10,000	10,000
+Other	5,000	5,000
+Total	10,000	10,000
+
+Analysis 4 - Track A: amount saved in a typical month (L4, FCFA), savers, by aspired sector: 75th percentile
+Aspired sector (P4, with 'Other' recoded from P4X)	All	Total
+	P75 L4	P75 L4
+Agriculture, livestock, fishing, forestry	25,000	25,000
+Manufacturing	30,000	30,000
+Construction	50,000	50,000
+Wholesale / retail trade	30,000	30,000
+Transport, storage, logistics	80,000	80,000
+Accommodation and food services	30,000	30,000
+Information, communication, digital	3,000	3,000
+Public administration	5,000	5,000
+Health and social work		
+Other services (repair, personal, arts)	25,000	25,000
+Other	7,500	7,500
+Total	30,000	30,000
 
 Analysis 4 - Track A: has a mobile money account (L1), by aspired sector
 L1. Has a mobile money account	Agriculture, livestock, fishing, forestry	Manufacturing	Construction	Wholesale / retail trade	Transport, storage, logistics	Accommodation and food services	Information, communication, digital	Public administration	Health and social work	Other services (repair, personal, arts)	Other	Total	Agriculture, livestock, fishing, forestry	Manufacturing	Construction	Wholesale / retail trade	Transport, storage, logistics	Accommodation and food services	Information, communication, digital	Public administration	Health and social work	Other services (repair, personal, arts)	Other	Total
@@ -319,79 +380,358 @@ No	37	7	33	117	6	2	1	3	1	43	5	255	94.9%	100.0%	94.3%	90.7%	100.0%	100.0%	100.0%	
 Yes	2	0	2	12	0	0	0	0	0	2	1	19	5.1%	0.0%	5.7%	9.3%	0.0%	0.0%	0.0%	0.0%	0.0%	4.4%	16.7%	6.9%
 Total	39	7	35	129	6	2	1	3	1	45	6	274	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%	100.0%
 
-L7. Main source of loan/debt	No.	%
-Mobile money credit	1	5.3%
-Tontine / VSLA (AVEC)	5	26.3%
-Family or friends	12	63.2%
-Informal lender	1	5.3%
-Total	19	100.0%
+Analysis 4 - Track A: main source of the loan (L7), those with a loan
+L7. Main source of loan/debt	All	Total	All	Total
+	No.	No.	%	%
+Mobile money credit	1	1	5.3%	5.3%
+Tontine / VSLA (AVEC)	5	5	26.3%	26.3%
+Family or friends	12	12	63.2%	63.2%
+Informal lender	1	1	5.3%	5.3%
+Total	19	19	100.0%	100.0%
 
-H4. Activity/business is registered	No.	%
-No	263	93.9%
-Yes	7	2.5%
-Don't know	10	3.6%
-Total	280	100.0%
+Analysis 4 - Track B: activity is registered (H4)
+H4. Activity/business is registered	All	Total	All	Total
+	No.	No.	%	%
+No	263	263	93.9%	93.9%
+Yes	7	7	2.5%	2.5%
+Don't know	10	10	3.6%	3.6%
+Total	280	280	100.0%	100.0%
 
-Number of paid workers (H4A, grouped)	No.	%
-None	202	72.9%
-1	15	5.4%
-2 to 4	33	11.9%
-5 or more	27	9.7%
-Total	277	100.0%
+Analysis 4 - Track B: number of paid workers, excluding self (H4A)
+Number of paid workers (H4A, grouped)	All	Total	All	Total
+	No.	No.	%	%
+None	202	202	72.9%	72.9%
+1	15	15	5.4%	5.4%
+2 to 4	33	33	11.9%	11.9%
+5 or more	27	27	9.7%	9.7%
+Total	277	277	100.0%	100.0%
 
-Provisional programme track	N	P25	Median	P75	Mean
-	H5	H5	H5	H5	H5
-Track B - Existing enterprise growth	210	15,000	40,000	100,000	79,452
-Total	210	15,000	40,000	100,000	79,452
+Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): number reporting
+Provisional programme track	All	Total
+	N H5	N H5
+Track B - Existing enterprise growth	210	210
+Total	210	210
 
-H5A. Earnings bracket, FCFA (if H5 refused)	No.	%
-Less than 30,000	29	41.4%
-30,000 - <75,000	17	24.3%
-75,000 - <150,000	16	22.9%
-150,000 - <300,000	4	5.7%
-300,000 - <500,000	3	4.3%
-800,000 - <1,000,000	1	1.4%
-Total	70	100.0%
+Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): 25th percentile
+Provisional programme track	All	Total
+	P25 H5	P25 H5
+Track B - Existing enterprise growth	15,000	15,000
+Total	15,000	15,000
 
-N1. Household affected by a shock, last 12 months	No.	%
-No	15	68.2%
-Yes	7	31.8%
-Total	22	100.0%
+Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): median
+Provisional programme track	All	Total
+	Median H5	Median H5
+Track B - Existing enterprise growth	40,000	40,000
+Total	40,000	40,000
 
-N3. Impact of the shock on income/activity	No.	%
-Limited impact, quickly overcome	3	42.9%
-Major impact, still recovering	3	42.9%
-Very major impact, activity stopped or sharply reduced	1	14.3%
-Total	7	100.0%
+Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): 75th percentile
+Provisional programme track	All	Total
+	P75 H5	P75 H5
+Track B - Existing enterprise growth	100,000	100,000
+Total	100,000	100,000
 
-N5. Time to recover pre-shock income/activity	No.	%
-Less than 1 month	1	14.3%
-1 to 3 months	3	42.9%
-Not yet recovered	3	42.9%
-Total	7	100.0%
+Analysis 4 - Track B: earnings from the activity last month (H5, FCFA): mean
+Provisional programme track	All	Total
+	Mean H5	Mean H5
+Track B - Existing enterprise growth	79,452	79,452
+Total	79,452	79,452
 
-N6. Could raise 250,000 FCFA for an emergency	No.	%
-Yes, easily	2	9.1%
-Yes, with difficulty	4	18.2%
-No, impossible	16	72.7%
-Total	22	100.0%
+Analysis 4 - Track B: earnings bracket (H5A, FCFA), those who would not give the amount
+H5A. Earnings bracket, FCFA (if H5 refused)	All	Total	All	Total
+	No.	No.	%	%
+Less than 30,000	29	29	41.4%	41.4%
+30,000 - <75,000	17	17	24.3%	24.3%
+75,000 - <150,000	16	16	22.9%	22.9%
+150,000 - <300,000	4	4	5.7%	5.7%
+300,000 - <500,000	3	3	4.3%	4.3%
+800,000 - <1,000,000	1	1	1.4%	1.4%
+Total	70	70	100.0%	100.0%
 
-Provisional programme track	N	Median	Mean
-	N7	N7	N7
-Track C - Apprenticeship to work	5	3	2.8
-Tracks A and C (both apply)	17	2	3.2
-Total	22	2	3.1
+Analysis 4 - Track C: household affected by a shock, last 12 months (N1)
+N1. Household affected by a shock, last 12 months	All	Total	All	Total
+	No.	No.	%	%
+No	15	15	68.2%	68.2%
+Yes	7	7	31.8%	31.8%
+Total	22	22	100.0%	100.0%
 
-Household vulnerability score (0-5)	No.	%	%
-0	3	13.6%	13.6%
-1	8	36.4%	50.0%
-2	7	31.8%	81.8%
-3	4	18.2%	100.0%
-Total	22	100.0%	
+Analysis 4 - Track C: impact of the shock (N3), households with a shock
+N3. Impact of the shock on income/activity	All	Total	All	Total
+	No.	No.	%	%
+Limited impact, quickly overcome	3	3	42.9%	42.9%
+Major impact, still recovering	3	3	42.9%	42.9%
+Very major impact, activity stopped or sharply reduced	1	1	14.3%	14.3%
+Total	7	7	100.0%	100.0%
 
-Provisional programme track	Mean	Mean	Mean	Mean	Mean
-	vuln 1	vuln 2	vuln 3	vuln 4	vuln 5
-Track C - Apprenticeship to work	0.40	0.00	0.20	0.20	0.20
-Tracks A and C (both apply)	0.82	0.06	0.12	0.29	0.41
-Total	0.73	0.05	0.14	0.27	0.36
+Analysis 4 - Track C: time to recover from the shock (N5), households with a shock
+N5. Time to recover pre-shock income/activity	All	Total	All	Total
+	No.	No.	%	%
+Less than 1 month	1	1	14.3%	14.3%
+1 to 3 months	3	3	42.9%	42.9%
+Not yet recovered	3	3	42.9%	42.9%
+Total	7	7	100.0%	100.0%
+
+Analysis 4 - Track C: could raise 250,000 FCFA for an emergency (N6)
+N6. Could raise 250,000 FCFA for an emergency	All	Total	All	Total
+	No.	No.	%	%
+Yes, easily	2	2	9.1%	9.1%
+Yes, with difficulty	4	4	18.2%	18.2%
+No, impossible	16	16	72.7%	72.7%
+Total	22	22	100.0%	100.0%
+
+Analysis 4 - Track C: ability to withstand an economic shock (N7, 1 = lowest, 10 = highest)
+N7. Ability to withstand an economic shock (1-10)	All	Total	All	Total
+	No.	No.	%	%
+1 (lowest)	7	7	31.8%	31.8%
+	4	4	18.2%	18.2%
+	4	4	18.2%	18.2%
+	2	2	9.1%	9.1%
+	2	2	9.1%	9.1%
+	1	1	4.5%	4.5%
+	1	1	4.5%	4.5%
+	1	1	4.5%	4.5%
+Total	22	22	100.0%	100.0%
+
+Analysis 4 - Track C: ability to withstand an economic shock (N7, 1-10): median
+Provisional programme track	All	Total
+	Median N7	Median N7
+Track C - Apprenticeship to work	3	3
+Tracks A and C (both apply)	2	2
+Total	2	2
+
+Analysis 4 - Track C: ability to withstand an economic shock (N7, 1-10): mean
+Provisional programme track	All	Total
+	Mean N7	Mean N7
+Track C - Apprenticeship to work	2.8	2.8
+Tracks A and C (both apply)	3.2	3.2
+Total	3.1	3.1
+
+Analysis 4 - Track C: household vulnerability score (0-5): number and % at each score
+Household vulnerability score (0-5)	All	Total	All	Total
+	No.	No.	%	%
+0	3	3	13.6%	13.6%
+1	8	8	36.4%	36.4%
+2	7	7	31.8%	31.8%
+3	4	4	18.2%	18.2%
+Total	22	22	100.0%	100.0%
+
+Analysis 4 - Track C: vulnerability signs (N6 emergency funds, M2 outside help, D4 no earner, D2/D1 half under 15, D5 few assets)
+	All	Total	All	Total
+	No.	No.	%	%
+Could not raise 250,000 FCFA in an emergency				
+No	6	6	27.3%	27.3%
+Yes	16	16	72.7%	72.7%
+Total	22	22	100.0%	100.0%
+
+Regularly relies on outside help				
+No	21	21	95.5%	95.5%
+Yes	1	1	4.5%	4.5%
+Total	22	22	100.0%	100.0%
+
+Nobody in the household earns				
+No	19	19	86.4%	86.4%
+Yes	3	3	13.6%	13.6%
+Total	22	22	100.0%	100.0%
+
+At least half the household under 15				
+No	16	16	72.7%	72.7%
+Yes	6	6	27.3%	27.3%
+Total	22	22	100.0%	100.0%
+
+2 or fewer household assets				
+No	14	14	63.6%	63.6%
+Yes	8	8	36.4%	36.4%
+Total	22	22	100.0%	100.0%
+
+Analysis 5 - Marital status (C3) by sex
+C3. Current marital status	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+Single	138	54	192	32.9%	26.0%	30.6%
+Married, monogamous	169	70	239	40.2%	33.7%	38.1%
+Married, polygamous	58	27	85	13.8%	13.0%	13.5%
+Cohabiting / free union	52	55	107	12.4%	26.4%	17.0%
+Divorced	3	1	4	0.7%	0.5%	0.6%
+Widowed	0	1	1	0.0%	0.5%	0.2%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 5 - Relationship to household head (D3) by sex
+D3. Relationship to household head	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+Household head	341	54	395	81.2%	26.0%	62.9%
+Spouse of head	2	124	126	0.5%	59.6%	20.1%
+Child of head	58	23	81	13.8%	11.1%	12.9%
+Other relative of head	18	7	25	4.3%	3.4%	4.0%
+Not related to head	1	0	1	0.2%	0.0%	0.2%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 5 - Household size (D1) by sex: mean
+All	Male	Female	Total
+	Mean D1	Mean D1	Mean D1
+All	8.0	7.7	7.9
+Total	8.0	7.7	7.9
+
+Analysis 5 - Household size (D1) by sex: median
+All	Male	Female	Total
+	Median D1	Median D1	Median D1
+All	6	7	6
+Total	6	7	6
+
+Analysis 5 - Household members under 15 (D2) by sex: mean
+All	Male	Female	Total
+	Mean D2	Mean D2	Mean D2
+All	3.3	3.4	3.3
+Total	3.3	3.4	3.3
+
+Analysis 5 - Household members in paid work (D4) by sex: mean
+All	Male	Female	Total
+	Mean D4	Mean D4	Mean D4
+All	2.4	2.3	2.4
+Total	2.4	2.3	2.4
+
+Analysis 5 - Urban/rural (B5) by sex
+B5. Area of residence	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+Urban	75	41	116	17.9%	19.7%	18.5%
+Rural	345	167	512	82.1%	80.3%	81.5%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 5 - Employed last 7 days by sex
+Employed last 7 days (E1/E2/E3, recomputed)	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+No	41	25	66	9.8%	12.0%	10.5%
+Yes	379	183	562	90.2%	88.0%	89.5%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 5 - Status in main job (F1) by sex, employed
+F1. Status in main job	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+Employee	19	3	22	5.0%	1.6%	3.9%
+Employer (with employees)	17	5	22	4.5%	2.7%	3.9%
+Own-account worker (no employees)	248	151	399	65.4%	82.5%	71.0%
+Member of producers' cooperative	3	0	3	0.8%	0.0%	0.5%
+Contributing family worker	64	18	82	16.9%	9.8%	14.6%
+Apprentice / intern	24	4	28	6.3%	2.2%	5.0%
+Other	4	2	6	1.1%	1.1%	1.1%
+Total	379	183	562	100.0%	100.0%	100.0%
+
+Analysis 5 - Current sector (F2) by sex, employed
+F2. Sector of main activity	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+Agriculture, livestock, fishing, forestry	232	65	297	61.2%	35.5%	52.8%
+Manufacturing	7	1	8	1.8%	0.5%	1.4%
+Construction	39	0	39	10.3%	0.0%	6.9%
+Wholesale / retail trade	22	80	102	5.8%	43.7%	18.1%
+Transport, storage, logistics	11	0	11	2.9%	0.0%	2.0%
+Accommodation and food services	0	2	2	0.0%	1.1%	0.4%
+Information, communication, digital	1	0	1	0.3%	0.0%	0.2%
+Finance and insurance	2	0	2	0.5%	0.0%	0.4%
+Public administration	2	0	2	0.5%	0.0%	0.4%
+Health and social work	1	0	1	0.3%	0.0%	0.2%
+Other services (repair, personal, arts)	36	9	45	9.5%	4.9%	8.0%
+Other	26	26	52	6.9%	14.2%	9.3%
+Total	379	183	562	100.0%	100.0%	100.0%
+
+Analysis 5 - Aspired sector (P4, Other recoded) by sex
+Aspired sector (P4, with 'Other' recoded from P4X)	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+Agriculture, livestock, fishing, forestry	100	11	111	23.8%	5.3%	17.7%
+Manufacturing	9	0	9	2.1%	0.0%	1.4%
+Construction	63	3	66	15.0%	1.4%	10.5%
+Wholesale / retail trade	162	130	292	38.6%	62.5%	46.5%
+Transport, storage, logistics	12	0	12	2.9%	0.0%	1.9%
+Accommodation and food services	2	4	6	0.5%	1.9%	1.0%
+Information, communication, digital	1	1	2	0.2%	0.5%	0.3%
+Finance and insurance	1	0	1	0.2%	0.0%	0.2%
+Public administration	1	5	6	0.2%	2.4%	1.0%
+Education	0	1	1	0.0%	0.5%	0.2%
+Health and social work	2	1	3	0.5%	0.5%	0.5%
+Other services (repair, personal, arts)	60	42	102	14.3%	20.2%	16.2%
+Other	7	10	17	1.7%	4.8%	2.7%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 5 - Provisional track by sex (column % = track mix by sex; row % = sex mix by track)
+Provisional programme track	Male	Female	Total	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%	%	%	%
+Track A - Start-up	183	74	257	43.6%	35.6%	40.9%	71.2%	28.8%	100.0%
+Track B - Existing enterprise growth	166	114	280	39.5%	54.8%	44.6%	59.3%	40.7%	100.0%
+Track C - Apprenticeship to work	5	0	5	1.2%	0.0%	0.8%	100.0%	0.0%	100.0%
+Tracks A and C (both apply)	8	9	17	1.9%	4.3%	2.7%	47.1%	52.9%	100.0%
+Undetermined	58	11	69	13.8%	5.3%	11.0%	84.1%	15.9%	100.0%
+Total	420	208	628	100.0%	100.0%	100.0%	66.9%	33.1%	100.0%
+
+Analysis 5 - Household affected by a shock, last 12 months (N1) by sex
+N1. Household affected by a shock, last 12 months	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+No	241	134	375	57.4%	64.4%	59.7%
+Yes	179	74	253	42.6%	35.6%	40.3%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 5 - Could raise 250,000 FCFA for an emergency (N6) by sex
+N6. Could raise 250,000 FCFA for an emergency	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+Yes, easily	52	17	69	12.4%	8.2%	11.0%
+Yes, with difficulty	179	71	250	42.6%	34.1%	39.8%
+No, impossible	189	120	309	45.0%	57.7%	49.2%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 5 - Household vulnerability score (0-5) by sex
+Household vulnerability score (0-5)	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+0	95	38	133	22.6%	18.3%	21.2%
+1	181	48	229	43.1%	23.1%	36.5%
+2	104	82	186	24.8%	39.4%	29.6%
+3	35	37	72	8.3%	17.8%	11.5%
+4	5	3	8	1.2%	1.4%	1.3%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 5 - Vocational/technical training in the last 12 months (O3) by sex
+O3. Vocational/technical training or apprenticeship, last 12 months	Male	Female	Total	Male	Female	Total
+	No.	No.	No.	%	%	%
+No	334	166	500	79.5%	79.8%	79.6%
+Yes	86	42	128	20.5%	20.2%	20.4%
+Total	420	208	628	100.0%	100.0%	100.0%
+
+Analysis 5 - Mean household vulnerability score (0-5) by track and sex
+Provisional programme track	Male	Female	Total
+	Mean vuln score	Mean vuln score	Mean vuln score
+Track A - Start-up	1.25	1.84	1.42
+Track B - Existing enterprise growth	1.18	1.38	1.26
+Track C - Apprenticeship to work	1.00		1.00
+Tracks A and C (both apply)	1.50	1.89	1.71
+Undetermined	1.26	2.27	1.42
+Total	1.22	1.61	1.35
+
+Analysis 5 - Share with vocational/technical training in the last 12 months (O3) by track and sex
+Provisional programme track	Male	Female	Total
+	Mean O3	Mean O3	Mean O3
+Track A - Start-up	0.28	0.12	0.23
+Track B - Existing enterprise growth	0.15	0.25	0.19
+Track C - Apprenticeship to work	0.00		0.00
+Tracks A and C (both apply)	0.38	0.33	0.35
+Undetermined	0.12	0.18	0.13
+Total	0.20	0.20	0.20
+
+Analysis 5 - Called sample (one row per cover_id) by sex from the ID prefix
+(firstnm) id_female	All	Total	All	Total
+	No.	No.	%	%
+Male (H- ID)	631	631	65.6%	65.6%
+Female (F- ID)	331	331	34.4%	34.4%
+Total	962	962	100.0%	100.0%
+
+Analysis 5 - Stages by sex: answered, consented, completed (column % = rate by sex; row % = sex mix)
+	Male (H- ID)	Female (F- ID)	Total	Male (H- ID)	Female (F- ID)	Total	Male (H- ID)	Female (F- ID)	Total
+	No.	No.	No.	%	%	%	%	%	%
+Call answered and interview started (A4), any attempt									
+No	212	120	332	33.6%	36.3%	34.5%	63.9%	36.1%	100.0%
+Yes	419	211	630	66.4%	63.7%	65.5%	66.5%	33.5%	100.0%
+Total	631	331	962	100.0%	100.0%	100.0%	65.6%	34.4%	100.0%
+
+Consented (B6D), any attempt									
+No	193	106	299	30.6%	32.0%	31.1%	64.5%	35.5%	100.0%
+Yes	438	225	663	69.4%	68.0%	68.9%	66.1%	33.9%	100.0%
+Total	631	331	962	100.0%	100.0%	100.0%	65.6%	34.4%	100.0%
+
+Completed interview, any attempt									
+No	225	127	352	35.7%	38.4%	36.6%	63.9%	36.1%	100.0%
+Yes	406	204	610	64.3%	61.6%	63.4%	66.6%	33.4%	100.0%
+Total	631	331	962	100.0%	100.0%	100.0%	65.6%	34.4%	100.0%
 
