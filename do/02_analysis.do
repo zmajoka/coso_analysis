@@ -32,13 +32,16 @@
         K1 = Yes AND main job F1 = employer, own-account worker or member of
         a producers' cooperative
     Track C - Apprenticeship to work
-        Not employed (E1-E3A) AND aspired sector (P4_sector) is a skilled trade:
-        manufacturing, construction, transport, accommodation/food,
-        ICT/digital, other services (repair, personal, arts)
-        (no condition on prior training)
-    Tracks A and C can overlap (not working, never started an activity,
-    wants to start one, aspires to a trade): reported as a separate category.
-    B cannot overlap with A (K1) or C (employment).
+        Aspired sector (P4_sector) is a skilled trade: manufacturing,
+        construction, transport, accommodation/food, ICT/digital, other
+        services (repair, personal, arts)
+        (no condition on employment status or prior training)
+        NOTE: the original rule also required being not employed (E1-E3A).
+        That condition was removed because only 22 of 628 applicants
+        qualified for Track C with it (90% of applicants are employed).
+    Tracks A and C, and Tracks B and C, can overlap: each overlap is
+    reported as a separate category (overlap rule still to be decided).
+    A and B cannot overlap (K1).
     Undetermined - everyone else, split by reason.
 ==============================================================================*/
 
@@ -105,61 +108,68 @@ label var crit_A "Meets Track A criteria (K1 = No, K2 = Yes)"
 gen byte crit_B = (K1 == 1 & inlist(F1, 2, 3, 4))
 label var crit_B "Meets Track B criteria (K1 = Yes, F1 = employer/own-account/coop)"
 
-* Track C: not employed and aspires to a skilled-trade sector
+* Track C: aspires to a skilled-trade sector
 *   P4_sector: 3 Manufacturing, 4 Construction, 6 Transport, 7 Accommodation/food,
 *       8 ICT/digital, 14 Other services (repair, personal, arts)
-gen byte crit_C = (employed == 0 & inlist(P4_sector, 3, 4, 6, 7, 8, 14))
-label var crit_C "Meets Track C criteria (not employed, aspires to a skilled trade)"
+*   NOTE: the "not employed" condition (employed == 0) of the original rule
+*   is removed: with it, only 22 of 628 applicants qualified for Track C.
+gen byte crit_C = inlist(P4_sector, 3, 4, 6, 7, 8, 14)
+label var crit_C "Meets Track C criteria (aspires to a skilled trade)"
 
 label values crit_A crit_B crit_C yesno
 
-* Check: B never overlaps with A or C (should both be 0)
+* Check: A and B never overlap (should be 0)
 count if crit_B == 1 & crit_A == 1
+
+* Overlaps with Track C
+count if crit_A == 1 & crit_C == 1
 count if crit_B == 1 & crit_C == 1
 
 *------------------------------------------------------------------------------*
 * 2.2 Provisional track
 *------------------------------------------------------------------------------*
-gen byte track = 5
+gen byte track = 6
 replace track = 1 if crit_A == 1 & crit_C == 0
-replace track = 2 if crit_B == 1
-replace track = 3 if crit_C == 1 & crit_A == 0
+replace track = 2 if crit_B == 1 & crit_C == 0
+replace track = 3 if crit_C == 1 & crit_A == 0 & crit_B == 0
 replace track = 4 if crit_A == 1 & crit_C == 1
+replace track = 5 if crit_B == 1 & crit_C == 1
 
 label define track 1 "Track A - Start-up"                    ///
                    2 "Track B - Existing enterprise growth"  ///
                    3 "Track C - Apprenticeship to work"      ///
                    4 "Tracks A and C (both apply)"           ///
-                   5 "Undetermined"
+                   5 "Tracks B and C (both apply)"           ///
+                   6 "Undetermined"
 label values track track
 label var track "Provisional programme track"
 
 * Reason for undetermined
+*   (none of them aspires to a skilled trade)
 *   1 Employed, but not employer/own-account/coop with an own activity
 *     (wage worker, family worker, apprentice, or never started an activity
 *     and not wanting to)
 *   2 Not employed, started an activity before (no longer running it)
-*   3 Not employed, never started, no wish to start, aspired sector is not
-*     a skilled trade
+*   3 Not employed, never started, no wish to start
 *   4 Missing information (K1, employment or P4_sector)
 gen byte undet_reason = .
-replace undet_reason = 4 if track == 5 & (missing(K1) | missing(employed))
-replace undet_reason = 1 if track == 5 & missing(undet_reason) & employed == 1
-replace undet_reason = 2 if track == 5 & missing(undet_reason) & employed == 0 & K1 == 1
-replace undet_reason = 3 if track == 5 & missing(undet_reason) & employed == 0 & K1 == 0
-replace undet_reason = 4 if track == 5 & missing(undet_reason)
+replace undet_reason = 4 if track == 6 & (missing(K1) | missing(employed))
+replace undet_reason = 1 if track == 6 & missing(undet_reason) & employed == 1
+replace undet_reason = 2 if track == 6 & missing(undet_reason) & employed == 0 & K1 == 1
+replace undet_reason = 3 if track == 6 & missing(undet_reason) & employed == 0 & K1 == 0
+replace undet_reason = 4 if track == 6 & missing(undet_reason)
 
 label define undet_reason                                                    ///
     1 "Employed, no own enterprise (wage/family worker, apprentice, or no wish to start)" ///
     2 "Not employed, had an activity before (closed)"                         ///
-    3 "Not employed, no wish to start, aspiration not a skilled trade"        ///
+    3 "Not employed, never started, no wish to start"                         ///
     4 "Missing information"
 label values undet_reason undet_reason
 label var undet_reason "Reason track is undetermined"
 
 * Spot checks
 tab track, missing
-tab undet_reason if track == 5, missing
+tab undet_reason if track == 6, missing
 tab track employed, missing
 tab track K1, missing
 
@@ -183,10 +193,10 @@ tabout crit_B total using "$out/Results.xls", ///
 
 tabout crit_C total using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 1 - Meets Track C criteria: not employed, aspires to a skilled trade")
+    h1("Analysis 1 - Meets Track C criteria: aspires to a skilled trade (no employment condition)")
 
 * 2.3.3 Why undetermined
-tabout undet_reason total if track == 5 using "$out/Results.xls", ///
+tabout undet_reason total if track == 6 using "$out/Results.xls", ///
     append c(freq col) format(0c 1p) layout(cb) style(xls) ///
     h1("Analysis 1 - Undetermined track - reason")
 
@@ -380,17 +390,18 @@ tabout train_match P4_sector using "$out/Results.xls", ///
 *------------------------------------------------------------------------------*
 * 4.3 Track C: unemployment duration (J2) by prior training and aspired sector
 *------------------------------------------------------------------------------*
-* Track C criteria met (crit_C: Track C alone or Tracks A and C).
-* J2 is blank for those not searching for work (J0 = No).
+* Track C criteria met (crit_C: Track C alone, or with Track A or Track B).
+* J2 is blank for the employed (section J not asked) and for those not
+* searching for work (J0 = No).
 tab J2 if crit_C == 1, missing
 
 tabout J2 O3 if crit_C == 1 using "$out/Results.xls", ///
     append mi c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 3 - Track C: time without work and searching (J2) by training in the last 12 months (O3); Missing = not searching")
+    h1("Analysis 3 - Track C: time without work and searching (J2) by training in the last 12 months (O3); Missing = employed or not searching")
 
 tabout J2 P4_sector if crit_C == 1 using "$out/Results.xls", ///
     append mi c(freq col) format(0c 1p) layout(cb) style(xls) ///
-    h1("Analysis 3 - Track C: time without work and searching (J2) by aspired sector; Missing = not searching")
+    h1("Analysis 3 - Track C: time without work and searching (J2) by aspired sector; Missing = employed or not searching")
 
 *==============================================================================*
 * 5. ANALYSIS 4 - FINANCIAL CONSTRAINT PROFILE BY TRACK
